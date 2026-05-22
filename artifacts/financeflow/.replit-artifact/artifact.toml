@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "FinanceFlow"
+version = "1.0.0"
+id = "artifacts/financeflow"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20389
+
+[services.development]
+run = "pnpm --filter @workspace/financeflow run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/financeflow", "run", "build" ]
+publicDir = "artifacts/financeflow/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20389"
+BASE_PATH = "/"
