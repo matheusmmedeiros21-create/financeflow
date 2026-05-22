@@ -6,3 +6,9 @@ id = "tX6GlqyjT99CU6SPNfkIM"
 uri = "file://financeflow-desktop.tar.gz"
 type = "unspecified"
 title = "FinanceFlow Desktop - Projeto Completo"
+
+[[outputs]]
+id = "EC1cnE0_NhVpRDaBv9hBj"
+uri = "file://financeflow-deploy.zip"
+type = "unspecified"
+title = "FinanceFlow — Arquivos para Netlify"
