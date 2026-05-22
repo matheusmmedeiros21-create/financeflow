@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "tX6GlqyjT99CU6SPNfkIM"
+uri = "file://financeflow-desktop.tar.gz"
+type = "unspecified"
+title = "FinanceFlow Desktop - Projeto Completo"
