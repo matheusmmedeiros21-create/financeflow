@@ -60,6 +60,7 @@ export default function FinanceFlow() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [contas, setContas] = useState<Conta[]>(DEFAULT_CONTAS)
   const [deletedNomes, setDeletedNomes] = useState<string[]>([])
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [pagosRecentes, setPagosRecentes] = useState<Set<number>>(new Set())
   const [showManualEntry, setShowManualEntry] = useState(false)
   const [manualForm, setManualForm] = useState({ valor: '', data: '', obs: '' })
@@ -144,10 +145,14 @@ export default function FinanceFlow() {
     return d.toISOString().split('T')[0]
   }
 
-  const filteredContas = useMemo(
-    () => contas.filter(c => c.nome.toLowerCase().includes(search.toLowerCase())),
-    [search, contas]
-  )
+  const filteredContas = useMemo(() => {
+    const filtered = contas.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()))
+    return [...filtered].sort((a, b) => {
+      const da = new Date(a.vencimento + 'T12:00:00').getTime()
+      const db = new Date(b.vencimento + 'T12:00:00').getTime()
+      return sortOrder === 'asc' ? da - db : db - da
+    })
+  }, [search, contas, sortOrder])
 
   const vencimentosSorted = useMemo(
     () => [...contas].sort((a, b) =>
@@ -358,12 +363,20 @@ export default function FinanceFlow() {
                 <h2 className="text-2xl font-bold text-zinc-900">Contas Registradas</h2>
                 <p className="text-zinc-500 text-sm mt-1">Prioridade automática baseada no vencimento</p>
               </div>
-              {urgentAccounts.length > 0 && (
-                <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-2xl font-semibold text-sm">
-                  <Bell size={16} />
-                  {urgentAccounts.length} {urgentAccounts.length === 1 ? 'conta urgente' : 'contas urgentes'}
-                </div>
-              )}
+              <div className="flex items-center gap-3 flex-wrap">
+                <button
+                  onClick={() => setSortOrder(o => o === 'asc' ? 'desc' : 'asc')}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white/80 border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
+                >
+                  📅 Vencimento {sortOrder === 'asc' ? '↑ Menor primeiro' : '↓ Maior primeiro'}
+                </button>
+                {urgentAccounts.length > 0 && (
+                  <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-2xl font-semibold text-sm">
+                    <Bell size={16} />
+                    {urgentAccounts.length} {urgentAccounts.length === 1 ? 'conta urgente' : 'contas urgentes'}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="divide-y divide-zinc-100/80">
