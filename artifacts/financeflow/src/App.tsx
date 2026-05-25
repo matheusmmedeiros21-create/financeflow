@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Bell, Plus, Search, Trash2, Pencil, X, CalendarClock, List } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Bell, Plus, Search, Trash2, Pencil, X, CalendarClock, List, PlusCircle } from 'lucide-react'
 
 interface Conta {
   id: number
@@ -17,24 +17,26 @@ interface RegistroPagamento {
   data: string
   hora: string
   timestamp: string
+  manual?: boolean
+  obs?: string
 }
 
 const DEFAULT_CONTAS: Conta[] = [
-  { id: 1, nome: 'SISTEMA SIGE', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-01', status: 'Pendente' },
-  { id: 2, nome: 'PLANO DE SAUDE PORTO', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-01', status: 'Pendente' },
-  { id: 3, nome: 'ADVOGADA ROBERTA', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-03', status: 'Pendente' },
-  { id: 4, nome: 'INTERNET', valor: 189.9, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 5, nome: 'METROMED', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 6, nome: 'DI LIFE', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 7, nome: 'IPTU - RECEITA FEDERAL', valor: 1200, tipo: 'Quinzenal', criada: '2026-05-01', vencimento: '2026-06-09', status: 'Pendente' },
-  { id: 8, nome: 'PLANO DE SAUDE NOTRE DAME', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 9, nome: 'ESCOLA CLARA', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 10, nome: 'ROTAEXATA', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 11, nome: 'PSICOLOGA NANCY', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-12', status: 'Pendente' },
-  { id: 12, nome: 'AGUA BRÁS', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-14', status: 'Pendente' },
-  { id: 13, nome: 'ASSINATURA INFOJOBS', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
-  { id: 14, nome: 'GOTO', valor: 0, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
-  { id: 15, nome: 'CONTABILIDADE', valor: 450, tipo: 'Mensal', criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pago' },
+  { id: 1,  nome: 'SISTEMA SIGE',            valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-01', status: 'Pendente' },
+  { id: 2,  nome: 'PLANO DE SAUDE PORTO',    valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-01', status: 'Pendente' },
+  { id: 3,  nome: 'ADVOGADA ROBERTA',        valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-03', status: 'Pendente' },
+  { id: 4,  nome: 'INTERNET',                valor: 189.9,  tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
+  { id: 5,  nome: 'METROMED',                valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
+  { id: 6,  nome: 'DI LIFE',                 valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
+  { id: 7,  nome: 'IPTU - RECEITA FEDERAL',  valor: 1200,   tipo: 'Quinzenal', criada: '2026-05-01', vencimento: '2026-06-09', status: 'Pendente' },
+  { id: 8,  nome: 'PLANO DE SAUDE NOTRE DAME', valor: 0,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
+  { id: 9,  nome: 'ESCOLA CLARA',            valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
+  { id: 10, nome: 'ROTAEXATA',               valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
+  { id: 11, nome: 'PSICOLOGA NANCY',         valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-12', status: 'Pendente' },
+  { id: 12, nome: 'AGUA BRÁS',               valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-14', status: 'Pendente' },
+  { id: 13, nome: 'ASSINATURA INFOJOBS',     valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
+  { id: 14, nome: 'GOTO',                    valor: 0,      tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
+  { id: 15, nome: 'CONTABILIDADE',           valor: 450,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
 ]
 
 const EMPTY_FORM = {
@@ -57,6 +59,10 @@ export default function FinanceFlow() {
   const [showHistorico, setShowHistorico] = useState<string | null>(null)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [contas, setContas] = useState<Conta[]>(DEFAULT_CONTAS)
+  const [pagosRecentes, setPagosRecentes] = useState<Set<number>>(new Set())
+  const [showManualEntry, setShowManualEntry] = useState(false)
+  const [manualForm, setManualForm] = useState({ valor: '', data: '', obs: '' })
+  const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
 
   useEffect(() => {
     try {
@@ -73,9 +79,7 @@ export default function FinanceFlow() {
   }, [])
 
   useEffect(() => {
-    try {
-      localStorage.setItem('financeflow-contas', JSON.stringify(contas))
-    } catch { /* ignore */ }
+    try { localStorage.setItem('financeflow-contas', JSON.stringify(contas)) } catch { /* ignore */ }
   }, [contas])
 
   useEffect(() => {
@@ -86,10 +90,10 @@ export default function FinanceFlow() {
   }, [])
 
   useEffect(() => {
-    try {
-      localStorage.setItem('financeflow-historico', JSON.stringify(historicoPagamentos))
-    } catch { /* ignore */ }
+    try { localStorage.setItem('financeflow-historico', JSON.stringify(historicoPagamentos)) } catch { /* ignore */ }
   }, [historicoPagamentos])
+
+  useEffect(() => () => { Object.values(timersRef.current).forEach(clearTimeout) }, [])
 
   const formatMoney = (value: number) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -119,17 +123,27 @@ export default function FinanceFlow() {
     return { label: 'OK', color: 'green' }
   }
 
+  const proximoVencimento = (vencimento: string, tipo: string): string => {
+    const d = new Date(vencimento + 'T12:00:00')
+    switch (tipo) {
+      case 'Semanal':   d.setDate(d.getDate() + 7); break
+      case 'Quinzenal': d.setDate(d.getDate() + 15); break
+      case 'Anual':     d.setFullYear(d.getFullYear() + 1); break
+      case 'Única':     return vencimento
+      default:          d.setMonth(d.getMonth() + 1); break
+    }
+    return d.toISOString().split('T')[0]
+  }
+
   const filteredContas = useMemo(
     () => contas.filter(c => c.nome.toLowerCase().includes(search.toLowerCase())),
     [search, contas]
   )
 
   const vencimentosSorted = useMemo(
-    () => [...contas].sort((a, b) => {
-      const da = new Date(a.vencimento + 'T12:00:00').getTime()
-      const db = new Date(b.vencimento + 'T12:00:00').getTime()
-      return da - db
-    }),
+    () => [...contas].sort((a, b) =>
+      new Date(a.vencimento + 'T12:00:00').getTime() - new Date(b.vencimento + 'T12:00:00').getTime()
+    ),
     [contas]
   )
 
@@ -141,9 +155,7 @@ export default function FinanceFlow() {
   const handleSubmit = () => {
     if (!form.nome.trim() || !form.vencimento) return
     if (editingId !== null) {
-      setContas(prev =>
-        prev.map(c => c.id === editingId ? { ...c, ...form, valor: Number(form.valor) || 0 } : c)
-      )
+      setContas(prev => prev.map(c => c.id === editingId ? { ...c, ...form, valor: Number(form.valor) || 0 } : c))
     } else {
       setContas(prev => [{ id: Date.now(), ...form, valor: Number(form.valor) || 0 }, ...prev])
     }
@@ -168,18 +180,6 @@ export default function FinanceFlow() {
     }
   }
 
-  const proximoVencimento = (vencimento: string, tipo: string): string => {
-    const d = new Date(vencimento + 'T12:00:00')
-    switch (tipo) {
-      case 'Semanal':    d.setDate(d.getDate() + 7); break
-      case 'Quinzenal':  d.setDate(d.getDate() + 15); break
-      case 'Anual':      d.setFullYear(d.getFullYear() + 1); break
-      case 'Única':      return vencimento
-      default:           d.setMonth(d.getMonth() + 1); break
-    }
-    return d.toISOString().split('T')[0]
-  }
-
   const handleStatusChange = (conta: Conta, newStatus: string) => {
     if (newStatus === 'Pago' && conta.status !== 'Pago') {
       const agora = new Date()
@@ -194,15 +194,62 @@ export default function FinanceFlow() {
         ...prev,
         [conta.nome]: [...(prev[conta.nome] || []), registro],
       }))
+
+      // Marca como "pago recente" para mostrar tachado
+      setPagosRecentes(prev => new Set(prev).add(conta.id))
+
+      // Após 1.5s, reseta para Pendente com nova data
       const novoVencimento = proximoVencimento(conta.vencimento, conta.tipo)
-      setContas(prev => prev.map(c =>
-        c.id === conta.id
-          ? { ...c, status: 'Pendente', vencimento: novoVencimento }
-          : c
-      ))
+      if (timersRef.current[conta.id]) clearTimeout(timersRef.current[conta.id])
+      timersRef.current[conta.id] = setTimeout(() => {
+        setContas(prev => prev.map(c =>
+          c.id === conta.id ? { ...c, status: 'Pendente', vencimento: novoVencimento } : c
+        ))
+        setPagosRecentes(prev => {
+          const next = new Set(prev)
+          next.delete(conta.id)
+          return next
+        })
+      }, 1500)
+
+      setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: 'Pago' } : c))
       return
     }
     setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus } : c))
+  }
+
+  const handleManualEntry = () => {
+    if (!showHistorico || !manualForm.data) return
+    const [dia, mes, ano] = manualForm.data.includes('/')
+      ? manualForm.data.split('/')
+      : new Date(manualForm.data + 'T12:00:00').toLocaleDateString('pt-BR').split('/')
+    const registro: RegistroPagamento = {
+      id: Date.now(),
+      valor: Number(manualForm.valor) || 0,
+      data: manualForm.data.includes('/') ? manualForm.data : `${dia}/${mes}/${ano}`,
+      hora: '00:00:00',
+      timestamp: manualForm.data.includes('/') ? new Date().toISOString() : new Date(manualForm.data + 'T12:00:00').toISOString(),
+      manual: true,
+      obs: manualForm.obs,
+    }
+    setHistoricoPagamentos(prev => ({
+      ...prev,
+      [showHistorico]: [...(prev[showHistorico] || []), registro],
+    }))
+    setManualForm({ valor: '', data: '', obs: '' })
+    setShowManualEntry(false)
+  }
+
+  const statusSelectClass = (status: string, size: 'normal' | 'small' = 'normal') => {
+    const base = size === 'normal'
+      ? 'rounded-xl text-sm font-semibold outline-none border transition-colors cursor-pointer px-4 py-2.5'
+      : 'rounded-xl text-xs font-semibold outline-none border transition-colors cursor-pointer px-3 py-2'
+    const color = status === 'Pago'
+      ? 'bg-emerald-500 border-emerald-600 text-white'
+      : status === 'Solicitado'
+      ? 'bg-blue-500 border-blue-600 text-white'
+      : 'bg-yellow-400 border-yellow-500 text-yellow-900'
+    return `${base} ${color}`
   }
 
   return (
@@ -227,9 +274,7 @@ export default function FinanceFlow() {
               <h1 className="text-5xl sm:text-6xl font-black tracking-tighter bg-gradient-to-b from-zinc-900 to-zinc-500 bg-clip-text text-transparent leading-none">
                 FinanceFlow
               </h1>
-              <p className="text-zinc-500 text-base mt-1.5 font-medium">
-                Gestão financeira inteligente
-              </p>
+              <p className="text-zinc-500 text-base mt-1.5 font-medium">Gestão financeira inteligente</p>
             </div>
           </div>
 
@@ -268,9 +313,7 @@ export default function FinanceFlow() {
           <button
             onClick={() => setTab('contas')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
-              tab === 'contas'
-                ? 'bg-zinc-900 text-white shadow-lg'
-                : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+              tab === 'contas' ? 'bg-zinc-900 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
             }`}
           >
             <List size={16} />
@@ -279,9 +322,7 @@ export default function FinanceFlow() {
           <button
             onClick={() => setTab('vencimentos')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
-              tab === 'vencimentos'
-                ? 'bg-zinc-900 text-white shadow-lg'
-                : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+              tab === 'vencimentos' ? 'bg-zinc-900 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
             }`}
           >
             <CalendarClock size={16} />
@@ -315,74 +356,78 @@ export default function FinanceFlow() {
               {filteredContas.map(conta => {
                 const priority = getPriority(conta)
                 const days = getDaysRemaining(conta.vencimento)
+                const isPagoRecente = pagosRecentes.has(conta.id)
                 return (
                   <div
                     key={conta.id}
-                    className="px-6 py-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 hover:bg-white/50 transition-colors"
+                    className={`px-6 py-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition-all ${
+                      isPagoRecente ? 'bg-emerald-50 opacity-60' : 'hover:bg-white/50'
+                    }`}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <h3 className="text-lg font-bold text-zinc-900 truncate">{conta.nome}</h3>
-                        <span className="bg-zinc-100 text-zinc-600 px-3 py-0.5 rounded-full text-xs font-medium border border-zinc-200">
-                          {conta.tipo}
-                        </span>
-                        <PriorityBadge label={priority.label} color={priority.color} />
+                        <h3 className={`text-lg font-bold text-zinc-900 truncate ${isPagoRecente ? 'line-through text-zinc-400' : ''}`}>
+                          {conta.nome}
+                        </h3>
+                        {isPagoRecente && (
+                          <span className="text-emerald-600 text-sm font-semibold animate-pulse">✓ Pago! Renovando...</span>
+                        )}
+                        {!isPagoRecente && (
+                          <>
+                            <span className="bg-zinc-100 text-zinc-600 px-3 py-0.5 rounded-full text-xs font-medium border border-zinc-200">
+                              {conta.tipo}
+                            </span>
+                            <PriorityBadge label={priority.label} color={priority.color} />
+                          </>
+                        )}
                       </div>
-                      <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
-                        <span>
-                          💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span>
-                        </span>
-                        <span>
-                          📅 <span className="font-semibold text-zinc-800">
-                            {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+                      {!isPagoRecente && (
+                        <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
+                          <span>💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span></span>
+                          <span>📅 <span className="font-semibold text-zinc-800">{new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span></span>
+                          <span className={days <= 1 && conta.status !== 'Pago' ? 'text-red-600 font-semibold' : ''}>
+                            ⏰ {conta.status === 'Pago' ? 'Pago' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
                           </span>
-                        </span>
-                        <span className={days <= 1 && conta.status !== 'Pago' ? 'text-red-600 font-semibold' : ''}>
-                          ⏰ {conta.status === 'Pago' ? 'Pago' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
-                        </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {!isPagoRecente && (
+                      <div className="flex items-center flex-wrap gap-2 xl:flex-nowrap xl:gap-2">
+                        <select
+                          value={conta.status}
+                          onChange={e => handleStatusChange(conta, e.target.value)}
+                          className={statusSelectClass(conta.status)}
+                        >
+                          <option value="Pendente">Pendente</option>
+                          <option value="Pago">Pago</option>
+                          <option value="Solicitado">Solicitado</option>
+                        </select>
+
+                        <button
+                          onClick={() => setShowHistorico(conta.nome)}
+                          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                        >
+                          Histórico
+                        </button>
+
+                        <button
+                          onClick={() => handleEdit(conta)}
+                          className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 p-2.5 rounded-xl transition-colors"
+                          title="Editar"
+                        >
+                          <Pencil size={16} />
+                        </button>
+
+                        <button
+                          onClick={() => deleteConta(conta.id)}
+                          className="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 p-2.5 rounded-xl transition-colors"
+                          title="Excluir"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                       </div>
-                    </div>
-
-                    <div className="flex items-center flex-wrap gap-2 xl:flex-nowrap xl:gap-2">
-                      <select
-                        value={conta.status}
-                        onChange={e => handleStatusChange(conta, e.target.value)}
-                        className={`px-4 py-2.5 rounded-xl text-sm font-semibold outline-none border transition-colors cursor-pointer ${
-                          conta.status === 'Pago'
-                            ? 'bg-emerald-500 border-emerald-600 text-white'
-                            : conta.status === 'Solicitado'
-                            ? 'bg-blue-500 border-blue-600 text-white'
-                            : 'bg-yellow-400 border-yellow-500 text-yellow-900'
-                        }`}
-                      >
-                        <option value="Pendente">Pendente</option>
-                        <option value="Pago">Pago</option>
-                        <option value="Solicitado">Solicitado</option>
-                      </select>
-
-                      <button
-                        onClick={() => setShowHistorico(conta.nome)}
-                        className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-                      >
-                        Histórico
-                      </button>
-
-                      <button
-                        onClick={() => handleEdit(conta)}
-                        className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 p-2.5 rounded-xl transition-colors"
-                        title="Editar"
-                      >
-                        <Pencil size={16} />
-                      </button>
-
-                      <button
-                        onClick={() => deleteConta(conta.id)}
-                        className="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 p-2.5 rounded-xl transition-colors"
-                        title="Excluir"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    )}
                   </div>
                 )
               })}
@@ -398,23 +443,18 @@ export default function FinanceFlow() {
               <p className="text-zinc-500 text-sm mt-1">Ordenado por data de vencimento</p>
             </div>
 
-            {/* Legenda */}
             <div className="px-8 py-4 border-b border-zinc-100 flex flex-wrap gap-4">
               <div className="flex items-center gap-2 text-sm font-medium text-red-700">
-                <span className="w-4 h-4 rounded-full bg-red-500 inline-block" />
-                Vence hoje / Vencido
+                <span className="w-4 h-4 rounded-full bg-red-600 inline-block" />Vence hoje / Vencido
               </div>
               <div className="flex items-center gap-2 text-sm font-medium text-yellow-700">
-                <span className="w-4 h-4 rounded-full bg-yellow-400 inline-block" />
-                Faltando até 5 dias
+                <span className="w-4 h-4 rounded-full bg-yellow-500 inline-block" />Faltando até 5 dias
               </div>
               <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
-                <span className="w-4 h-4 rounded-full bg-blue-500 inline-block" />
-                Boleto já solicitado
+                <span className="w-4 h-4 rounded-full bg-blue-600 inline-block" />Boleto já solicitado
               </div>
               <div className="flex items-center gap-2 text-sm font-medium text-emerald-700">
-                <span className="w-4 h-4 rounded-full bg-emerald-500 inline-block" />
-                Pago
+                <span className="w-4 h-4 rounded-full bg-emerald-500 inline-block" />Pago
               </div>
             </div>
 
@@ -422,6 +462,7 @@ export default function FinanceFlow() {
               {vencimentosSorted.map((conta, idx) => {
                 const color = getVencimentoColor(conta)
                 const days = getDaysRemaining(conta.vencimento)
+                const isPagoRecente = pagosRecentes.has(conta.id)
 
                 const rowBg: Record<string, string> = {
                   red: 'bg-red-100 hover:bg-red-200/70 border-l-4 border-l-red-500',
@@ -430,88 +471,48 @@ export default function FinanceFlow() {
                   green: 'bg-emerald-50 hover:bg-emerald-100/70 border-l-4 border-l-emerald-400',
                   default: 'hover:bg-white/50 border-l-4 border-l-zinc-200',
                 }
-
                 const dotColor: Record<string, string> = {
-                  red: 'bg-red-600',
-                  yellow: 'bg-yellow-500',
-                  blue: 'bg-blue-600',
-                  green: 'bg-emerald-500',
-                  default: 'bg-zinc-400',
+                  red: 'bg-red-600', yellow: 'bg-yellow-500', blue: 'bg-blue-600', green: 'bg-emerald-500', default: 'bg-zinc-400',
                 }
-
                 const dateColor: Record<string, string> = {
-                  red: 'text-red-800 font-bold',
-                  yellow: 'text-yellow-800 font-bold',
-                  blue: 'text-blue-800 font-semibold',
-                  green: 'text-emerald-800 font-semibold',
-                  default: 'text-zinc-700 font-semibold',
+                  red: 'text-red-800 font-bold', yellow: 'text-yellow-800 font-bold', blue: 'text-blue-800 font-semibold', green: 'text-emerald-800 font-semibold', default: 'text-zinc-700 font-semibold',
                 }
-
                 const statusLabel: Record<string, string> = {
-                  red: days <= 0 ? 'VENCIDO' : 'VENCE HOJE',
-                  yellow: `${days} dias`,
-                  blue: 'Solicitado',
-                  green: 'Pago',
-                  default: `${days} dias`,
+                  red: days <= 0 ? 'VENCIDO' : 'VENCE HOJE', yellow: `${days} dias`, blue: 'Solicitado', green: 'Pago', default: `${days} dias`,
                 }
-
                 const badgeBg: Record<string, string> = {
-                  red: 'bg-red-600 text-white border-red-700',
-                  yellow: 'bg-yellow-500 text-white border-yellow-600',
-                  blue: 'bg-blue-600 text-white border-blue-700',
-                  green: 'bg-emerald-600 text-white border-emerald-700',
-                  default: 'bg-zinc-200 text-zinc-700 border-zinc-300',
+                  red: 'bg-red-600 text-white border-red-700', yellow: 'bg-yellow-500 text-white border-yellow-600', blue: 'bg-blue-600 text-white border-blue-700', green: 'bg-emerald-600 text-white border-emerald-700', default: 'bg-zinc-200 text-zinc-700 border-zinc-300',
                 }
 
                 return (
                   <div
                     key={conta.id}
-                    className={`px-6 py-4 flex items-center gap-4 transition-colors ${rowBg[color]}`}
+                    className={`px-6 py-4 flex items-center gap-4 transition-all ${
+                      isPagoRecente ? 'bg-emerald-50 opacity-60' : rowBg[color]
+                    }`}
                   >
-                    {/* Número */}
-                    <span className="text-zinc-400 text-sm font-mono w-6 text-right flex-shrink-0">
-                      {idx + 1}
-                    </span>
-
-                    {/* Dot de cor */}
-                    <span className={`w-3 h-3 rounded-full flex-shrink-0 ${dotColor[color]}`} />
-
-                    {/* Nome */}
-                    <span className="flex-1 font-bold text-zinc-900 text-base truncate">
+                    <span className="text-zinc-400 text-sm font-mono w-6 text-right flex-shrink-0">{idx + 1}</span>
+                    <span className={`w-3 h-3 rounded-full flex-shrink-0 ${isPagoRecente ? 'bg-emerald-500' : dotColor[color]}`} />
+                    <span className={`flex-1 font-bold text-zinc-900 text-base truncate ${isPagoRecente ? 'line-through text-zinc-400' : ''}`}>
                       {conta.nome}
                     </span>
-
-                    {/* Valor */}
-                    <span className="text-zinc-700 font-semibold text-sm hidden sm:block flex-shrink-0">
-                      {formatMoney(conta.valor)}
-                    </span>
-
-                    {/* Data */}
-                    <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>
-                      📅 {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
-                    </span>
-
-                    {/* Badge status */}
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold border flex-shrink-0 ${badgeBg[color]}`}>
-                      {statusLabel[color]}
-                    </span>
-
-                    {/* Mudar status */}
-                    <select
-                      value={conta.status}
-                      onChange={e => handleStatusChange(conta, e.target.value)}
-                      className={`px-3 py-2 rounded-xl text-xs font-semibold outline-none border transition-colors cursor-pointer flex-shrink-0 ${
-                        conta.status === 'Pago'
-                          ? 'bg-emerald-500 border-emerald-600 text-white'
-                          : conta.status === 'Solicitado'
-                          ? 'bg-blue-500 border-blue-600 text-white'
-                          : 'bg-yellow-400 border-yellow-500 text-yellow-900'
-                      }`}
-                    >
-                      <option value="Pendente">Pendente</option>
-                      <option value="Pago">Pago</option>
-                      <option value="Solicitado">Solicitado</option>
-                    </select>
+                    {isPagoRecente
+                      ? <span className="text-emerald-600 text-sm font-semibold animate-pulse flex-shrink-0">✓ Renovando...</span>
+                      : <>
+                          <span className="text-zinc-700 font-semibold text-sm hidden sm:block flex-shrink-0">{formatMoney(conta.valor)}</span>
+                          <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>📅 {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold border flex-shrink-0 ${badgeBg[color]}`}>{statusLabel[color]}</span>
+                          <select
+                            value={conta.status}
+                            onChange={e => handleStatusChange(conta, e.target.value)}
+                            className={`flex-shrink-0 ${statusSelectClass(conta.status, 'small')}`}
+                          >
+                            <option value="Pendente">Pendente</option>
+                            <option value="Pago">Pago</option>
+                            <option value="Solicitado">Solicitado</option>
+                          </select>
+                        </>
+                    }
                   </div>
                 )
               })}
@@ -522,21 +523,86 @@ export default function FinanceFlow() {
 
       {/* Histórico Modal */}
       {showHistorico && (
-        <Modal onClose={() => setShowHistorico(null)}>
+        <Modal onClose={() => { setShowHistorico(null); setShowManualEntry(false); setManualForm({ valor: '', data: '', obs: '' }) }}>
           <div className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold text-zinc-900">{showHistorico}</h2>
               <p className="text-zinc-500 text-sm mt-1">Histórico completo de pagamentos</p>
             </div>
             <button
-              onClick={() => setShowHistorico(null)}
+              onClick={() => { setShowHistorico(null); setShowManualEntry(false) }}
               className="ml-4 p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-500 transition-colors"
             >
               <X size={18} />
             </button>
           </div>
 
-          <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+          {/* Adicionar manualmente */}
+          <div className="mb-5">
+            {!showManualEntry ? (
+              <button
+                onClick={() => setShowManualEntry(true)}
+                className="flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                <PlusCircle size={16} />
+                Adicionar pagamento manualmente
+              </button>
+            ) : (
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 space-y-3">
+                <p className="text-sm font-bold text-blue-800">Registrar pagamento manual</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mb-1 block">Valor (R$)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="0,00"
+                      value={manualForm.valor}
+                      onChange={e => setManualForm(f => ({ ...f, valor: e.target.value }))}
+                      className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-400/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mb-1 block">Data *</label>
+                    <input
+                      type="date"
+                      value={manualForm.data}
+                      onChange={e => setManualForm(f => ({ ...f, data: e.target.value }))}
+                      className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-400/50"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-zinc-600 uppercase tracking-wide mb-1 block">Observação (opcional)</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: Pago via boleto..."
+                    value={manualForm.obs}
+                    onChange={e => setManualForm(f => ({ ...f, obs: e.target.value }))}
+                    className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-400/50"
+                  />
+                </div>
+                <div className="flex gap-2 pt-1">
+                  <button
+                    onClick={handleManualEntry}
+                    disabled={!manualForm.data}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white rounded-xl text-sm font-semibold transition-colors"
+                  >
+                    Salvar
+                  </button>
+                  <button
+                    onClick={() => { setShowManualEntry(false); setManualForm({ valor: '', data: '', obs: '' }) }}
+                    className="px-4 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-xl text-sm font-semibold transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3 max-h-[45vh] overflow-y-auto pr-1">
             {(historicoPagamentos[showHistorico] || []).length === 0 ? (
               <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-10 text-center text-zinc-400">
                 <p className="text-3xl mb-2">📋</p>
@@ -546,13 +612,19 @@ export default function FinanceFlow() {
               [...(historicoPagamentos[showHistorico] || [])]
                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                 .map(registro => (
-                  <div
-                    key={registro.id}
-                    className="bg-white border border-zinc-200 rounded-2xl p-4 flex items-center justify-between shadow-sm"
-                  >
+                  <div key={registro.id} className="bg-white border border-zinc-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
                     <div>
-                      <p className="font-semibold text-zinc-900">{showHistorico}</p>
-                      <p className="text-zinc-500 text-sm mt-0.5">Pago em {registro.data} às {registro.hora}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-zinc-900">{showHistorico}</p>
+                        {registro.manual && (
+                          <span className="text-xs bg-blue-100 text-blue-700 border border-blue-200 px-2 py-0.5 rounded-full font-medium">Manual</span>
+                        )}
+                      </div>
+                      <p className="text-zinc-500 text-sm mt-0.5">
+                        {registro.manual
+                          ? `Registrado em ${registro.data}${registro.obs ? ` — ${registro.obs}` : ''}`
+                          : `Pago em ${registro.data} às ${registro.hora}`}
+                      </p>
                     </div>
                     <p className="text-lg font-black text-emerald-600">{formatMoney(registro.valor)}</p>
                   </div>
@@ -569,10 +641,7 @@ export default function FinanceFlow() {
             <h2 className="text-2xl font-bold text-zinc-900">
               {editingId !== null ? 'Editar Conta' : 'Nova Conta'}
             </h2>
-            <button
-              onClick={closeModal}
-              className="ml-4 p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-500 transition-colors"
-            >
+            <button onClick={closeModal} className="ml-4 p-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-500 transition-colors">
               <X size={18} />
             </button>
           </div>
@@ -646,10 +715,7 @@ export default function FinanceFlow() {
           </div>
 
           <div className="flex justify-end gap-3 mt-7">
-            <button
-              onClick={closeModal}
-              className="px-5 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-sm transition-colors"
-            >
+            <button onClick={closeModal} className="px-5 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-sm transition-colors">
               Cancelar
             </button>
             <button
