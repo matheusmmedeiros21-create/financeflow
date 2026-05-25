@@ -59,6 +59,7 @@ export default function FinanceFlow() {
   const [showHistorico, setShowHistorico] = useState<string | null>(null)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [contas, setContas] = useState<Conta[]>(DEFAULT_CONTAS)
+  const [deletedNomes, setDeletedNomes] = useState<string[]>([])
   const [pagosRecentes, setPagosRecentes] = useState<Set<number>>(new Set())
   const [showManualEntry, setShowManualEntry] = useState(false)
   const [manualForm, setManualForm] = useState({ valor: '', data: '', obs: '' })
@@ -66,14 +67,18 @@ export default function FinanceFlow() {
 
   useEffect(() => {
     try {
+      const savedDeleted: string[] = JSON.parse(localStorage.getItem('financeflow-deleted') || '[]')
+      setDeletedNomes(savedDeleted)
       const saved = localStorage.getItem('financeflow-contas')
       if (saved) {
         const parsed: Conta[] = JSON.parse(saved)
         const merged = [
-          ...DEFAULT_CONTAS.filter(d => !parsed.some(p => p.nome === d.nome)),
+          ...DEFAULT_CONTAS.filter(d => !parsed.some(p => p.nome === d.nome) && !savedDeleted.includes(d.nome)),
           ...parsed,
         ]
         setContas(merged)
+      } else {
+        setContas(DEFAULT_CONTAS.filter(d => !savedDeleted.includes(d.nome)))
       }
     } catch { /* ignore */ }
   }, [])
@@ -81,6 +86,10 @@ export default function FinanceFlow() {
   useEffect(() => {
     try { localStorage.setItem('financeflow-contas', JSON.stringify(contas)) } catch { /* ignore */ }
   }, [contas])
+
+  useEffect(() => {
+    try { localStorage.setItem('financeflow-deleted', JSON.stringify(deletedNomes)) } catch { /* ignore */ }
+  }, [deletedNomes])
 
   useEffect(() => {
     try {
@@ -176,6 +185,10 @@ export default function FinanceFlow() {
 
   const deleteConta = (id: number) => {
     if (confirm('Tem certeza que deseja excluir esta conta?')) {
+      const conta = contas.find(c => c.id === id)
+      if (conta) {
+        setDeletedNomes(prev => prev.includes(conta.nome) ? prev : [...prev, conta.nome])
+      }
       setContas(prev => prev.filter(c => c.id !== id))
     }
   }
