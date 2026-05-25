@@ -1,0 +1,57 @@
+12:18:21 PM: Netlify Build                                                 
+12:18:21 PM: ────────────────────────────────────────────────────────────────
+12:18:21 PM: ​
+12:18:21 PM: ❯ Version
+12:18:21 PM:   @netlify/build 35.13.4
+12:18:21 PM: ​
+12:18:21 PM: ❯ Flags
+12:18:21 PM:   accountId: 6a142c9df6c2485b43680d48
+12:18:21 PM:   baseRelDir: true
+12:18:21 PM:   buildId: 6a1468302cfcdb409cc159bc
+12:18:21 PM:   deployId: 6a1468302cfcdb409cc159be
+12:18:21 PM:   packagePath: artifacts/financeflow
+12:18:21 PM: ​
+12:18:21 PM: ❯ Current directory
+12:18:21 PM:   /opt/build/repo
+12:18:21 PM: ​
+12:18:21 PM: ❯ Config file
+12:18:21 PM:   /opt/build/repo/netlify.toml
+12:18:21 PM: ​
+12:18:21 PM: ❯ Context
+12:18:21 PM:   production
+12:18:21 PM: ​
+12:18:21 PM: build.command from netlify.toml                               
+12:18:21 PM: ────────────────────────────────────────────────────────────────
+12:18:21 PM: ​
+12:18:21 PM: $ npm install -g pnpm && pnpm install && PORT=80 BASE_PATH=/ pnpm --filter @workspace/financeflow run build
+12:18:22 PM: npm error code EEXIST
+12:18:22 PM: npm error path /opt/buildhome/.nvm/versions/node/v20.20.2/bin/pnpm
+12:18:22 PM: npm error EEXIST: file already exists
+12:18:22 PM: npm error File exists: /opt/buildhome/.nvm/versions/node/v20.20.2/bin/pnpm
+12:18:22 PM: npm error Remove the existing file and try again, or run npm
+12:18:22 PM: npm error with --force to overwrite files recklessly.
+12:18:22 PM: npm error A complete log of this run can be found in: /opt/buildhome/.npm/_logs/2026-05-25T15_18_21_942Z-debug-0.log
+12:18:22 PM: ​
+12:18:22 PM: "build.command" failed                                        
+12:18:22 PM: ────────────────────────────────────────────────────────────────
+12:18:22 PM: ​
+12:18:22 PM:   Error message
+12:18:22 PM:   Command failed with exit code 1: npm install -g pnpm && pnpm install && PORT=80 BASE_PATH=/ pnpm --filter @workspace/financeflow run build (https://ntl.fyi/exit-code-1)
+12:18:22 PM: ​
+12:18:22 PM:   Error location
+12:18:22 PM:   In build.command from netlify.toml:
+12:18:22 PM:   npm install -g pnpm && pnpm install && PORT=80 BASE_PATH=/ pnpm --filter @workspace/financeflow run build
+12:18:22 PM: ​
+12:18:22 PM:   Resolved config
+12:18:22 PM:   build:
+12:18:22 PM:     command: npm install -g pnpm && pnpm install && PORT=80 BASE_PATH=/ pnpm
+12:18:22 PM:       --filter @workspace/financeflow run build
+12:18:22 PM:     commandOrigin: config
+12:18:22 PM:     environment:
+12:18:22 PM:       - NODE_VERSION
+12:18:22 PM:     publish: /opt/build/repo/artifacts/financeflow/dist/public
+12:18:22 PM:     publishOrigin: config
+12:18:22 PM: Build failed due to a user error: Build script returned non-zero exit code: 2
+12:18:22 PM: Failing build: Failed to build site
+12:18:23 PM: Finished processing build request in 13.823s
+12:18:22 PM: Failed during stage 'building site': Build script returned non-zero exit code: 2 (https://ntl.fyi/exit-code-2)
