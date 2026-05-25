@@ -218,6 +218,13 @@ export default function FinanceFlow() {
     setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus } : c))
   }
 
+  const deleteHistoricoEntry = (nomeConta: string, registroId: number) => {
+    setHistoricoPagamentos(prev => ({
+      ...prev,
+      [nomeConta]: (prev[nomeConta] || []).filter(r => r.id !== registroId),
+    }))
+  }
+
   const handleManualEntry = () => {
     if (!showHistorico || !manualForm.data) return
     const [dia, mes, ano] = manualForm.data.includes('/')
@@ -612,8 +619,8 @@ export default function FinanceFlow() {
               [...(historicoPagamentos[showHistorico] || [])]
                 .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
                 .map(registro => (
-                  <div key={registro.id} className="bg-white border border-zinc-200 rounded-2xl p-4 flex items-center justify-between shadow-sm">
-                    <div>
+                  <div key={registro.id} className="bg-white border border-zinc-200 rounded-2xl p-4 flex items-center justify-between shadow-sm gap-3">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-zinc-900">{showHistorico}</p>
                         {registro.manual && (
@@ -626,7 +633,18 @@ export default function FinanceFlow() {
                           : `Pago em ${registro.data} às ${registro.hora}`}
                       </p>
                     </div>
-                    <p className="text-lg font-black text-emerald-600">{formatMoney(registro.valor)}</p>
+                    <p className="text-lg font-black text-emerald-600 flex-shrink-0">{formatMoney(registro.valor)}</p>
+                    <button
+                      onClick={() => {
+                        if (confirm('Excluir este registro do histórico?')) {
+                          deleteHistoricoEntry(showHistorico!, registro.id)
+                        }
+                      }}
+                      className="flex-shrink-0 p-2 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-500 transition-colors"
+                      title="Excluir registro"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
                 ))
             )}
