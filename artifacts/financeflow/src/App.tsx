@@ -330,10 +330,10 @@ export default function FinanceFlow() {
                         onChange={e => handleStatusChange(conta, e.target.value)}
                         className={`px-4 py-2.5 rounded-xl text-sm font-semibold outline-none border transition-colors cursor-pointer ${
                           conta.status === 'Pago'
-                            ? 'bg-green-50 border-green-200 text-green-700'
+                            ? 'bg-emerald-500 border-emerald-600 text-white'
                             : conta.status === 'Solicitado'
-                            ? 'bg-blue-50 border-blue-200 text-blue-700'
-                            : 'bg-amber-50 border-amber-200 text-amber-700'
+                            ? 'bg-blue-500 border-blue-600 text-white'
+                            : 'bg-yellow-400 border-yellow-500 text-yellow-900'
                         }`}
                       >
                         <option value="Pendente">Pendente</option>
@@ -405,26 +405,26 @@ export default function FinanceFlow() {
                 const days = getDaysRemaining(conta.vencimento)
 
                 const rowBg: Record<string, string> = {
-                  red: 'bg-red-50/80 hover:bg-red-50',
-                  yellow: 'bg-yellow-50/80 hover:bg-yellow-50',
-                  blue: 'bg-blue-50/80 hover:bg-blue-50',
-                  green: 'bg-emerald-50/40 hover:bg-emerald-50/60',
-                  default: 'hover:bg-white/50',
+                  red: 'bg-red-100 hover:bg-red-200/70 border-l-4 border-l-red-500',
+                  yellow: 'bg-yellow-100 hover:bg-yellow-200/70 border-l-4 border-l-yellow-400',
+                  blue: 'bg-blue-100 hover:bg-blue-200/70 border-l-4 border-l-blue-500',
+                  green: 'bg-emerald-50 hover:bg-emerald-100/70 border-l-4 border-l-emerald-400',
+                  default: 'hover:bg-white/50 border-l-4 border-l-zinc-200',
                 }
 
                 const dotColor: Record<string, string> = {
-                  red: 'bg-red-500',
-                  yellow: 'bg-yellow-400',
-                  blue: 'bg-blue-500',
+                  red: 'bg-red-600',
+                  yellow: 'bg-yellow-500',
+                  blue: 'bg-blue-600',
                   green: 'bg-emerald-500',
-                  default: 'bg-zinc-300',
+                  default: 'bg-zinc-400',
                 }
 
                 const dateColor: Record<string, string> = {
-                  red: 'text-red-700 font-bold',
-                  yellow: 'text-yellow-700 font-bold',
-                  blue: 'text-blue-700 font-semibold',
-                  green: 'text-emerald-700 font-semibold',
+                  red: 'text-red-800 font-bold',
+                  yellow: 'text-yellow-800 font-bold',
+                  blue: 'text-blue-800 font-semibold',
+                  green: 'text-emerald-800 font-semibold',
                   default: 'text-zinc-700 font-semibold',
                 }
 
@@ -437,11 +437,11 @@ export default function FinanceFlow() {
                 }
 
                 const badgeBg: Record<string, string> = {
-                  red: 'bg-red-100 text-red-700 border-red-200',
-                  yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-                  blue: 'bg-blue-100 text-blue-700 border-blue-200',
-                  green: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-                  default: 'bg-zinc-100 text-zinc-600 border-zinc-200',
+                  red: 'bg-red-600 text-white border-red-700',
+                  yellow: 'bg-yellow-500 text-white border-yellow-600',
+                  blue: 'bg-blue-600 text-white border-blue-700',
+                  green: 'bg-emerald-600 text-white border-emerald-700',
+                  default: 'bg-zinc-200 text-zinc-700 border-zinc-300',
                 }
 
                 return (
@@ -483,10 +483,10 @@ export default function FinanceFlow() {
                       onChange={e => handleStatusChange(conta, e.target.value)}
                       className={`px-3 py-2 rounded-xl text-xs font-semibold outline-none border transition-colors cursor-pointer flex-shrink-0 ${
                         conta.status === 'Pago'
-                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                          ? 'bg-emerald-500 border-emerald-600 text-white'
                           : conta.status === 'Solicitado'
-                          ? 'bg-blue-50 border-blue-200 text-blue-700'
-                          : 'bg-amber-50 border-amber-200 text-amber-700'
+                          ? 'bg-blue-500 border-blue-600 text-white'
+                          : 'bg-yellow-400 border-yellow-500 text-yellow-900'
                       }`}
                     >
                       <option value="Pendente">Pendente</option>
