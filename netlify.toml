@@ -1,0 +1,6 @@
+[build]
+  command = "npm install -g pnpm && pnpm install && PORT=80 BASE_PATH=/ pnpm --filter @workspace/financeflow run build"
+  publish = "artifacts/financeflow/dist/public"
+
+[build.environment]
+  NODE_VERSION = "20"
