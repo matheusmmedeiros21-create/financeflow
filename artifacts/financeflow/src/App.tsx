@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Bell, Plus, Search, Trash2, Pencil, X } from 'lucide-react'
+import { Bell, Plus, Search, Trash2, Pencil, X, CalendarClock, List } from 'lucide-react'
 
 interface Conta {
   id: number
@@ -46,7 +46,10 @@ const EMPTY_FORM = {
   status: 'Pendente',
 }
 
+type Tab = 'contas' | 'vencimentos'
+
 export default function FinanceFlow() {
+  const [tab, setTab] = useState<Tab>('contas')
   const [showModal, setShowModal] = useState(false)
   const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -55,7 +58,6 @@ export default function FinanceFlow() {
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [contas, setContas] = useState<Conta[]>(DEFAULT_CONTAS)
 
-  // Load from localStorage on mount
   useEffect(() => {
     try {
       const saved = localStorage.getItem('financeflow-contas')
@@ -100,6 +102,15 @@ export default function FinanceFlow() {
     return Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
   }
 
+  const getVencimentoColor = (conta: Conta): 'red' | 'yellow' | 'blue' | 'green' | 'default' => {
+    if (conta.status === 'Pago') return 'green'
+    if (conta.status === 'Solicitado') return 'blue'
+    const days = getDaysRemaining(conta.vencimento)
+    if (days <= 0) return 'red'
+    if (days <= 5) return 'yellow'
+    return 'default'
+  }
+
   const getPriority = (conta: Conta) => {
     if (conta.status === 'Pago') return { label: 'Pago', color: 'green' }
     const days = getDaysRemaining(conta.vencimento)
@@ -111,6 +122,15 @@ export default function FinanceFlow() {
   const filteredContas = useMemo(
     () => contas.filter(c => c.nome.toLowerCase().includes(search.toLowerCase())),
     [search, contas]
+  )
+
+  const vencimentosSorted = useMemo(
+    () => [...contas].sort((a, b) => {
+      const da = new Date(a.vencimento + 'T12:00:00').getTime()
+      const db = new Date(b.vencimento + 'T12:00:00').getTime()
+      return da - db
+    }),
+    [contas]
   )
 
   const urgentAccounts = contas.filter(c => getPriority(c).label === 'URGENTE')
@@ -168,7 +188,6 @@ export default function FinanceFlow() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100 relative overflow-x-hidden">
-      {/* Ambient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-blue-400/15 blur-3xl" />
@@ -178,7 +197,6 @@ export default function FinanceFlow() {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10">
           <div className="flex items-center gap-5">
-            {/* Logo */}
             <div className="relative flex-shrink-0">
               <div className="absolute inset-0 bg-emerald-400/40 blur-2xl rounded-3xl scale-110" />
               <div className="relative w-20 h-20 rounded-3xl border border-white/40 bg-white/20 backdrop-blur-xl shadow-xl flex items-center justify-center overflow-hidden">
@@ -197,15 +215,17 @@ export default function FinanceFlow() {
           </div>
 
           <div className="flex flex-wrap gap-3 items-center">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-              <input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Pesquisar contas..."
-                className="pl-11 pr-4 py-3.5 bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl w-64 sm:w-72 outline-none focus:ring-2 focus:ring-emerald-400/50 shadow-md text-zinc-800 placeholder:text-zinc-400 text-sm transition-all"
-              />
-            </div>
+            {tab === 'contas' && (
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <input
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Pesquisar contas..."
+                  className="pl-11 pr-4 py-3.5 bg-white/80 backdrop-blur-xl border border-white/60 rounded-2xl w-64 sm:w-72 outline-none focus:ring-2 focus:ring-emerald-400/50 shadow-md text-zinc-800 placeholder:text-zinc-400 text-sm transition-all"
+                />
+              </div>
+            )}
             <button
               onClick={() => setShowModal(true)}
               className="bg-zinc-900 hover:bg-zinc-700 active:scale-95 text-white px-5 py-3.5 rounded-2xl flex items-center gap-2 shadow-lg font-semibold text-sm transition-all"
@@ -224,69 +244,246 @@ export default function FinanceFlow() {
           <SummaryCard emoji="💰" label="Total do Mês" value={formatMoney(totalMonth)} accent="blue" />
         </div>
 
-        {/* Accounts Table */}
-        <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
-          {/* Table Header */}
-          <div className="px-8 py-6 border-b border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-bold text-zinc-900">Contas Registradas</h2>
-              <p className="text-zinc-500 text-sm mt-1">Prioridade automática baseada no vencimento</p>
-            </div>
-            {urgentAccounts.length > 0 && (
-              <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-2xl font-semibold text-sm">
-                <Bell size={16} />
-                {urgentAccounts.length} {urgentAccounts.length === 1 ? 'conta urgente' : 'contas urgentes'}
-              </div>
-            )}
-          </div>
+        {/* Tab Switcher */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setTab('contas')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
+              tab === 'contas'
+                ? 'bg-zinc-900 text-white shadow-lg'
+                : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+            }`}
+          >
+            <List size={16} />
+            Contas Registradas
+          </button>
+          <button
+            onClick={() => setTab('vencimentos')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
+              tab === 'vencimentos'
+                ? 'bg-zinc-900 text-white shadow-lg'
+                : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+            }`}
+          >
+            <CalendarClock size={16} />
+            Lista de Vencimentos
+          </button>
+        </div>
 
-          <div className="divide-y divide-zinc-100/80">
-            {filteredContas.length === 0 && (
-              <div className="px-8 py-16 text-center text-zinc-400">
-                <p className="text-4xl mb-3">📭</p>
-                <p className="font-medium">Nenhuma conta encontrada</p>
+        {/* Tab: Contas Registradas */}
+        {tab === 'contas' && (
+          <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 py-6 border-b border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-zinc-900">Contas Registradas</h2>
+                <p className="text-zinc-500 text-sm mt-1">Prioridade automática baseada no vencimento</p>
               </div>
-            )}
-            {filteredContas.map(conta => {
-              const priority = getPriority(conta)
-              const days = getDaysRemaining(conta.vencimento)
-              return (
-                <div
-                  key={conta.id}
-                  className="px-6 py-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 hover:bg-white/50 transition-colors"
-                >
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-3">
-                      <h3 className="text-lg font-bold text-zinc-900 truncate">{conta.nome}</h3>
-                      <span className="bg-zinc-100 text-zinc-600 px-3 py-0.5 rounded-full text-xs font-medium border border-zinc-200">
-                        {conta.tipo}
-                      </span>
-                      <PriorityBadge label={priority.label} color={priority.color} />
-                    </div>
-                    <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
-                      <span>
-                        💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span>
-                      </span>
-                      <span>
-                        📅 <span className="font-semibold text-zinc-800">
-                          {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+              {urgentAccounts.length > 0 && (
+                <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-2xl font-semibold text-sm">
+                  <Bell size={16} />
+                  {urgentAccounts.length} {urgentAccounts.length === 1 ? 'conta urgente' : 'contas urgentes'}
+                </div>
+              )}
+            </div>
+
+            <div className="divide-y divide-zinc-100/80">
+              {filteredContas.length === 0 && (
+                <div className="px-8 py-16 text-center text-zinc-400">
+                  <p className="text-4xl mb-3">📭</p>
+                  <p className="font-medium">Nenhuma conta encontrada</p>
+                </div>
+              )}
+              {filteredContas.map(conta => {
+                const priority = getPriority(conta)
+                const days = getDaysRemaining(conta.vencimento)
+                return (
+                  <div
+                    key={conta.id}
+                    className="px-6 py-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4 hover:bg-white/50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                        <h3 className="text-lg font-bold text-zinc-900 truncate">{conta.nome}</h3>
+                        <span className="bg-zinc-100 text-zinc-600 px-3 py-0.5 rounded-full text-xs font-medium border border-zinc-200">
+                          {conta.tipo}
                         </span>
-                      </span>
-                      <span className={days <= 1 && conta.status !== 'Pago' ? 'text-red-600 font-semibold' : ''}>
-                        ⏰ {conta.status === 'Pago' ? 'Pago' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
-                      </span>
+                        <PriorityBadge label={priority.label} color={priority.color} />
+                      </div>
+                      <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
+                        <span>
+                          💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span>
+                        </span>
+                        <span>
+                          📅 <span className="font-semibold text-zinc-800">
+                            {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+                          </span>
+                        </span>
+                        <span className={days <= 1 && conta.status !== 'Pago' ? 'text-red-600 font-semibold' : ''}>
+                          ⏰ {conta.status === 'Pago' ? 'Pago' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center flex-wrap gap-2 xl:flex-nowrap xl:gap-2">
+                      <select
+                        value={conta.status}
+                        onChange={e => handleStatusChange(conta, e.target.value)}
+                        className={`px-4 py-2.5 rounded-xl text-sm font-semibold outline-none border transition-colors cursor-pointer ${
+                          conta.status === 'Pago'
+                            ? 'bg-green-50 border-green-200 text-green-700'
+                            : conta.status === 'Solicitado'
+                            ? 'bg-blue-50 border-blue-200 text-blue-700'
+                            : 'bg-amber-50 border-amber-200 text-amber-700'
+                        }`}
+                      >
+                        <option value="Pendente">Pendente</option>
+                        <option value="Pago">Pago</option>
+                        <option value="Solicitado">Solicitado</option>
+                      </select>
+
+                      <button
+                        onClick={() => setShowHistorico(conta.nome)}
+                        className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+                      >
+                        Histórico
+                      </button>
+
+                      <button
+                        onClick={() => handleEdit(conta)}
+                        className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 p-2.5 rounded-xl transition-colors"
+                        title="Editar"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button
+                        onClick={() => deleteConta(conta.id)}
+                        className="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 p-2.5 rounded-xl transition-colors"
+                        title="Excluir"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
-                  {/* Actions */}
-                  <div className="flex items-center flex-wrap gap-2 xl:flex-nowrap xl:gap-2">
+        {/* Tab: Lista de Vencimentos */}
+        {tab === 'vencimentos' && (
+          <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+            <div className="px-8 py-6 border-b border-zinc-200/60">
+              <h2 className="text-2xl font-bold text-zinc-900">Lista de Vencimentos</h2>
+              <p className="text-zinc-500 text-sm mt-1">Ordenado por data de vencimento</p>
+            </div>
+
+            {/* Legenda */}
+            <div className="px-8 py-4 border-b border-zinc-100 flex flex-wrap gap-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-red-700">
+                <span className="w-4 h-4 rounded-full bg-red-500 inline-block" />
+                Vence hoje / Vencido
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium text-yellow-700">
+                <span className="w-4 h-4 rounded-full bg-yellow-400 inline-block" />
+                Faltando até 5 dias
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
+                <span className="w-4 h-4 rounded-full bg-blue-500 inline-block" />
+                Boleto já solicitado
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium text-emerald-700">
+                <span className="w-4 h-4 rounded-full bg-emerald-500 inline-block" />
+                Pago
+              </div>
+            </div>
+
+            <div className="divide-y divide-zinc-100/80">
+              {vencimentosSorted.map((conta, idx) => {
+                const color = getVencimentoColor(conta)
+                const days = getDaysRemaining(conta.vencimento)
+
+                const rowBg: Record<string, string> = {
+                  red: 'bg-red-50/80 hover:bg-red-50',
+                  yellow: 'bg-yellow-50/80 hover:bg-yellow-50',
+                  blue: 'bg-blue-50/80 hover:bg-blue-50',
+                  green: 'bg-emerald-50/40 hover:bg-emerald-50/60',
+                  default: 'hover:bg-white/50',
+                }
+
+                const dotColor: Record<string, string> = {
+                  red: 'bg-red-500',
+                  yellow: 'bg-yellow-400',
+                  blue: 'bg-blue-500',
+                  green: 'bg-emerald-500',
+                  default: 'bg-zinc-300',
+                }
+
+                const dateColor: Record<string, string> = {
+                  red: 'text-red-700 font-bold',
+                  yellow: 'text-yellow-700 font-bold',
+                  blue: 'text-blue-700 font-semibold',
+                  green: 'text-emerald-700 font-semibold',
+                  default: 'text-zinc-700 font-semibold',
+                }
+
+                const statusLabel: Record<string, string> = {
+                  red: days <= 0 ? 'VENCIDO' : 'VENCE HOJE',
+                  yellow: `${days} dias`,
+                  blue: 'Solicitado',
+                  green: 'Pago',
+                  default: `${days} dias`,
+                }
+
+                const badgeBg: Record<string, string> = {
+                  red: 'bg-red-100 text-red-700 border-red-200',
+                  yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
+                  blue: 'bg-blue-100 text-blue-700 border-blue-200',
+                  green: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                  default: 'bg-zinc-100 text-zinc-600 border-zinc-200',
+                }
+
+                return (
+                  <div
+                    key={conta.id}
+                    className={`px-6 py-4 flex items-center gap-4 transition-colors ${rowBg[color]}`}
+                  >
+                    {/* Número */}
+                    <span className="text-zinc-400 text-sm font-mono w-6 text-right flex-shrink-0">
+                      {idx + 1}
+                    </span>
+
+                    {/* Dot de cor */}
+                    <span className={`w-3 h-3 rounded-full flex-shrink-0 ${dotColor[color]}`} />
+
+                    {/* Nome */}
+                    <span className="flex-1 font-bold text-zinc-900 text-base truncate">
+                      {conta.nome}
+                    </span>
+
+                    {/* Valor */}
+                    <span className="text-zinc-700 font-semibold text-sm hidden sm:block flex-shrink-0">
+                      {formatMoney(conta.valor)}
+                    </span>
+
+                    {/* Data */}
+                    <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>
+                      📅 {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}
+                    </span>
+
+                    {/* Badge status */}
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold border flex-shrink-0 ${badgeBg[color]}`}>
+                      {statusLabel[color]}
+                    </span>
+
+                    {/* Mudar status */}
                     <select
                       value={conta.status}
                       onChange={e => handleStatusChange(conta, e.target.value)}
-                      className={`px-4 py-2.5 rounded-xl text-sm font-semibold outline-none border transition-colors cursor-pointer ${
+                      className={`px-3 py-2 rounded-xl text-xs font-semibold outline-none border transition-colors cursor-pointer flex-shrink-0 ${
                         conta.status === 'Pago'
-                          ? 'bg-green-50 border-green-200 text-green-700'
+                          ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                           : conta.status === 'Solicitado'
                           ? 'bg-blue-50 border-blue-200 text-blue-700'
                           : 'bg-amber-50 border-amber-200 text-amber-700'
@@ -296,35 +493,12 @@ export default function FinanceFlow() {
                       <option value="Pago">Pago</option>
                       <option value="Solicitado">Solicitado</option>
                     </select>
-
-                    <button
-                      onClick={() => setShowHistorico(conta.nome)}
-                      className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-                    >
-                      Histórico
-                    </button>
-
-                    <button
-                      onClick={() => handleEdit(conta)}
-                      className="bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 p-2.5 rounded-xl transition-colors"
-                      title="Editar"
-                    >
-                      <Pencil size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => deleteConta(conta.id)}
-                      className="bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 p-2.5 rounded-xl transition-colors"
-                      title="Excluir"
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Histórico Modal */}
