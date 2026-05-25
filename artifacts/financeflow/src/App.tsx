@@ -168,6 +168,18 @@ export default function FinanceFlow() {
     }
   }
 
+  const proximoVencimento = (vencimento: string, tipo: string): string => {
+    const d = new Date(vencimento + 'T12:00:00')
+    switch (tipo) {
+      case 'Semanal':    d.setDate(d.getDate() + 7); break
+      case 'Quinzenal':  d.setDate(d.getDate() + 15); break
+      case 'Anual':      d.setFullYear(d.getFullYear() + 1); break
+      case 'Única':      return vencimento
+      default:           d.setMonth(d.getMonth() + 1); break
+    }
+    return d.toISOString().split('T')[0]
+  }
+
   const handleStatusChange = (conta: Conta, newStatus: string) => {
     if (newStatus === 'Pago' && conta.status !== 'Pago') {
       const agora = new Date()
@@ -182,6 +194,13 @@ export default function FinanceFlow() {
         ...prev,
         [conta.nome]: [...(prev[conta.nome] || []), registro],
       }))
+      const novoVencimento = proximoVencimento(conta.vencimento, conta.tipo)
+      setContas(prev => prev.map(c =>
+        c.id === conta.id
+          ? { ...c, status: 'Pendente', vencimento: novoVencimento }
+          : c
+      ))
+      return
     }
     setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus } : c))
   }
