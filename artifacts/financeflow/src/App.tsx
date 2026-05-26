@@ -98,10 +98,10 @@ const EMPTY_FORM = {
   status: 'Pendente',
 }
 
-type Tab = 'pendentes' | 'pagos' | 'vencimentos'
+type Tab = 'vencidos' | 'avencer' | 'solicitado' | 'vencimentos'
 
 export default function FinanceFlow() {
-  const [tab, setTab] = useState<Tab>('pendentes')
+  const [tab, setTab] = useState<Tab>('avencer')
   const [showModal, setShowModal] = useState(false)
   const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -246,9 +246,14 @@ export default function FinanceFlow() {
   }
 
   const filteredContas = useMemo(() => {
-    const byTab = contas.filter(c =>
-      tab === 'pagos' ? c.status === 'Pago' : c.status !== 'Pago'
-    )
+    const byTab = contas.filter(c => {
+      if (c.status === 'Pago') return false
+      const days = getDaysRemaining(c.vencimento)
+      if (tab === 'vencidos') return c.status === 'Pendente' && days <= 0
+      if (tab === 'avencer') return c.status === 'Pendente' && days > 0
+      if (tab === 'solicitado') return c.status === 'Solicitado'
+      return false
+    })
     const filtered = byTab.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()))
     return [...filtered].sort((a, b) => {
       const da = new Date(a.vencimento + 'T12:00:00').getTime()
@@ -407,10 +412,10 @@ export default function FinanceFlow() {
             </div>
             <div className="px-6 py-4 bg-zinc-50 flex gap-3">
               <button
-                onClick={() => { setShowAlerta(false); setTab('pendentes') }}
+                onClick={() => { setShowAlerta(false); setTab('avencer') }}
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-2xl text-sm transition-colors"
               >
-                Ver Contas Pendentes
+                Ver A Vencer
               </button>
               <button
                 onClick={() => setShowAlerta(false)}
@@ -443,7 +448,7 @@ export default function FinanceFlow() {
           </div>
 
           <div className="flex flex-wrap gap-3 items-center">
-            {(tab === 'pendentes' || tab === 'pagos') && (
+            {(tab === 'vencidos' || tab === 'avencer' || tab === 'solicitado') && (
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                 <input
@@ -475,22 +480,31 @@ export default function FinanceFlow() {
         {/* Tab Switcher */}
         <div className="flex gap-2 mb-6 flex-wrap">
           <button
-            onClick={() => setTab('pendentes')}
+            onClick={() => setTab('vencidos')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
-              tab === 'pendentes' ? 'bg-zinc-900 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+              tab === 'vencidos' ? 'bg-red-600 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
             }`}
           >
-            <List size={16} />
-            Pendentes ({contas.filter(c => c.status !== 'Pago').length})
+            <Bell size={16} />
+            Vencidos ({contas.filter(c => c.status === 'Pendente' && getDaysRemaining(c.vencimento) <= 0).length})
           </button>
           <button
-            onClick={() => setTab('pagos')}
+            onClick={() => setTab('avencer')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
-              tab === 'pagos' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+              tab === 'avencer' ? 'bg-zinc-900 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
             }`}
           >
             <List size={16} />
-            Pagos ({contas.filter(c => c.status === 'Pago').length})
+            A Vencer ({contas.filter(c => c.status === 'Pendente' && getDaysRemaining(c.vencimento) > 0).length})
+          </button>
+          <button
+            onClick={() => setTab('solicitado')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
+              tab === 'solicitado' ? 'bg-blue-600 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+            }`}
+          >
+            <List size={16} />
+            Solicitado ({contas.filter(c => c.status === 'Solicitado').length})
           </button>
           <button
             onClick={() => setTab('vencimentos')}
@@ -503,15 +517,17 @@ export default function FinanceFlow() {
           </button>
         </div>
 
-        {/* Tab: Pendentes / Pagos */}
-        {(tab === 'pendentes' || tab === 'pagos') && (
+        {/* Tab: Vencidos / A Vencer / Solicitado */}
+        {(tab === 'vencidos' || tab === 'avencer' || tab === 'solicitado') && (
           <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
             <div className="px-8 py-6 border-b border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                {tab === 'pagos'
-                  ? <h2 className="text-2xl font-bold text-zinc-900">Contas Pagas ✅</h2>
-                  : <h2 className="text-2xl font-bold text-zinc-900">Contas Pendentes</h2>}
-                <p className="text-zinc-500 text-sm mt-1">{tab === 'pagos' ? 'Contas já quitadas neste ciclo' : 'Prioridade automática baseada no vencimento'}</p>
+                {tab === 'vencidos' && <h2 className="text-2xl font-bold text-red-700">🔴 Contas Vencidas</h2>}
+                {tab === 'avencer' && <h2 className="text-2xl font-bold text-zinc-900">📅 A Vencer</h2>}
+                {tab === 'solicitado' && <h2 className="text-2xl font-bold text-blue-700">🔵 Boleto Solicitado</h2>}
+                <p className="text-zinc-500 text-sm mt-1">
+                  {tab === 'vencidos' ? 'Prazo ultrapassado — pagar com urgência' : tab === 'avencer' ? 'Próximas a vencer' : 'Aguardando confirmação de pagamento'}
+                </p>
               </div>
               <div className="flex items-center gap-3 flex-wrap">
                 <button
