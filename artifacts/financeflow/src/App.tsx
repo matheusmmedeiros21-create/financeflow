@@ -113,7 +113,31 @@ export default function FinanceFlow() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [showManualEntry, setShowManualEntry] = useState(false)
   const [manualForm, setManualForm] = useState({ valor: '', data: '', obs: '' })
+  const [showAlerta, setShowAlerta] = useState(false)
+  const [alertaContas, setAlertaContas] = useState<Conta[]>([])
   const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
+  const alertadoRef = useRef(false)
+
+  const playAlertSound = () => {
+    try {
+      const ctx = new AudioContext()
+      const playBeep = (freq: number, start: number, duration: number) => {
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = freq
+        osc.type = 'sine'
+        gain.gain.setValueAtTime(0.3, ctx.currentTime + start)
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + duration)
+        osc.start(ctx.currentTime + start)
+        osc.stop(ctx.currentTime + start + duration)
+      }
+      playBeep(880, 0, 0.2)
+      playBeep(660, 0.25, 0.2)
+      playBeep(880, 0.5, 0.4)
+    } catch { /* ignore */ }
+  }
 
   useEffect(() => {
     try {
@@ -151,6 +175,35 @@ export default function FinanceFlow() {
   }, [historicoPagamentos])
 
   useEffect(() => () => { Object.values(timersRef.current).forEach(clearTimeout) }, [])
+
+  useEffect(() => {
+    if (alertadoRef.current) return
+    const urgentes = contas.filter(c => {
+      if (c.status === 'Pago') return false
+      const days = getDaysRemaining(c.vencimento)
+      return days <= 0
+    })
+    const hoje = contas.filter(c => {
+      if (c.status === 'Pago') return false
+      const days = getDaysRemaining(c.vencimento)
+      return days === 0
+    })
+    const alerta = contas.filter(c => {
+      if (c.status === 'Pago') return false
+      const days = getDaysRemaining(c.vencimento)
+      return days <= 3
+    })
+    if (alerta.length > 0) {
+      alertadoRef.current = true
+      setAlertaContas(alerta.sort((a, b) =>
+        new Date(a.vencimento + 'T12:00:00').getTime() - new Date(b.vencimento + 'T12:00:00').getTime()
+      ))
+      setTimeout(() => {
+        setShowAlerta(true)
+        if (urgentes.length > 0 || hoje.length > 0) playAlertSound()
+      }, 800)
+    }
+  }, [contas])
 
   const formatMoney = (value: number) =>
     value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -313,6 +366,62 @@ export default function FinanceFlow() {
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-blue-400/15 blur-3xl" />
       </div>
+
+      {/* Alerta de Vencimentos */}
+      {showAlerta && alertaContas.length > 0 && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-bounce-once">
+            <div className="bg-red-600 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Bell className="text-white animate-pulse" size={24} />
+                <div>
+                  <h2 className="text-white font-black text-xl">⚠️ Alerta de Vencimentos</h2>
+                  <p className="text-red-100 text-sm">{alertaContas.length} conta{alertaContas.length > 1 ? 's' : ''} vencendo em breve</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAlerta(false)} className="text-white hover:text-red-200 transition-colors">
+                <X size={22} />
+              </button>
+            </div>
+            <div className="max-h-96 overflow-y-auto divide-y divide-zinc-100">
+              {alertaContas.map(conta => {
+                const days = getDaysRemaining(conta.vencimento)
+                const isVencido = days < 0
+                const isHoje = days === 0
+                return (
+                  <div key={conta.id} className={`px-6 py-4 flex items-center justify-between gap-3 ${isVencido ? 'bg-red-50' : isHoje ? 'bg-orange-50' : 'bg-yellow-50'}`}>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-zinc-900 truncate">{conta.nome}</p>
+                      <p className="text-sm text-zinc-500">{formatMoney(conta.valor)}</p>
+                    </div>
+                    <span className={`px-3 py-1.5 rounded-full text-xs font-black border flex-shrink-0 ${
+                      isVencido ? 'bg-red-600 text-white border-red-700' :
+                      isHoje ? 'bg-orange-500 text-white border-orange-600' :
+                      'bg-yellow-500 text-white border-yellow-600'
+                    }`}>
+                      {isVencido ? `${Math.abs(days)}d atraso` : isHoje ? 'HOJE!' : `${days} dias`}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+            <div className="px-6 py-4 bg-zinc-50 flex gap-3">
+              <button
+                onClick={() => { setShowAlerta(false); setTab('pendentes') }}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-2xl text-sm transition-colors"
+              >
+                Ver Contas Pendentes
+              </button>
+              <button
+                onClick={() => setShowAlerta(false)}
+                className="px-5 py-3 bg-zinc-200 hover:bg-zinc-300 text-zinc-700 font-semibold rounded-2xl text-sm transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="relative max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
