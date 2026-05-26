@@ -98,10 +98,10 @@ const EMPTY_FORM = {
   status: 'Pendente',
 }
 
-type Tab = 'contas' | 'vencimentos'
+type Tab = 'pendentes' | 'pagos' | 'vencimentos'
 
 export default function FinanceFlow() {
-  const [tab, setTab] = useState<Tab>('contas')
+  const [tab, setTab] = useState<Tab>('pendentes')
   const [showModal, setShowModal] = useState(false)
   const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
@@ -111,7 +111,6 @@ export default function FinanceFlow() {
   const [contas, setContas] = useState<Conta[]>(DEFAULT_CONTAS)
   const [deletedNomes, setDeletedNomes] = useState<string[]>([])
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
-  const [pagosRecentes, setPagosRecentes] = useState<Set<number>>(new Set())
   const [showManualEntry, setShowManualEntry] = useState(false)
   const [manualForm, setManualForm] = useState({ valor: '', data: '', obs: '' })
   const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
@@ -194,13 +193,16 @@ export default function FinanceFlow() {
   }
 
   const filteredContas = useMemo(() => {
-    const filtered = contas.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()))
+    const byTab = contas.filter(c =>
+      tab === 'pagos' ? c.status === 'Pago' : c.status !== 'Pago'
+    )
+    const filtered = byTab.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()))
     return [...filtered].sort((a, b) => {
       const da = new Date(a.vencimento + 'T12:00:00').getTime()
       const db = new Date(b.vencimento + 'T12:00:00').getTime()
       return sortOrder === 'asc' ? da - db : db - da
     })
-  }, [search, contas, sortOrder])
+  }, [search, contas, sortOrder, tab])
 
   const vencimentosSorted = useMemo(
     () => [...contas].sort((a, b) =>
@@ -260,26 +262,6 @@ export default function FinanceFlow() {
         ...prev,
         [conta.nome]: [...(prev[conta.nome] || []), registro],
       }))
-
-      // Marca como "pago recente" para mostrar tachado
-      setPagosRecentes(prev => new Set(prev).add(conta.id))
-
-      // Após 1.5s, reseta para Pendente com nova data
-      const novoVencimento = proximoVencimento(conta.vencimento, conta.tipo)
-      if (timersRef.current[conta.id]) clearTimeout(timersRef.current[conta.id])
-      timersRef.current[conta.id] = setTimeout(() => {
-        setContas(prev => prev.map(c =>
-          c.id === conta.id ? { ...c, status: 'Pendente', vencimento: novoVencimento } : c
-        ))
-        setPagosRecentes(prev => {
-          const next = new Set(prev)
-          next.delete(conta.id)
-          return next
-        })
-      }, 1500)
-
-      setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: 'Pago' } : c))
-      return
     }
     setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus } : c))
   }
@@ -352,7 +334,7 @@ export default function FinanceFlow() {
           </div>
 
           <div className="flex flex-wrap gap-3 items-center">
-            {tab === 'contas' && (
+            {(tab === 'pendentes' || tab === 'pagos') && (
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                 <input
@@ -382,15 +364,24 @@ export default function FinanceFlow() {
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           <button
-            onClick={() => setTab('contas')}
+            onClick={() => setTab('pendentes')}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
-              tab === 'contas' ? 'bg-zinc-900 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+              tab === 'pendentes' ? 'bg-zinc-900 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
             }`}
           >
             <List size={16} />
-            Contas Registradas
+            Pendentes ({contas.filter(c => c.status !== 'Pago').length})
+          </button>
+          <button
+            onClick={() => setTab('pagos')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
+              tab === 'pagos' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+            }`}
+          >
+            <List size={16} />
+            Pagos ({contas.filter(c => c.status === 'Pago').length})
           </button>
           <button
             onClick={() => setTab('vencimentos')}
@@ -399,17 +390,19 @@ export default function FinanceFlow() {
             }`}
           >
             <CalendarClock size={16} />
-            Lista de Vencimentos
+            Vencimentos
           </button>
         </div>
 
-        {/* Tab: Contas Registradas */}
-        {tab === 'contas' && (
+        {/* Tab: Pendentes / Pagos */}
+        {(tab === 'pendentes' || tab === 'pagos') && (
           <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
             <div className="px-8 py-6 border-b border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-zinc-900">Contas Registradas</h2>
-                <p className="text-zinc-500 text-sm mt-1">Prioridade automática baseada no vencimento</p>
+                {tab === 'pagos'
+                  ? <h2 className="text-2xl font-bold text-zinc-900">Contas Pagas ✅</h2>
+                  : <h2 className="text-2xl font-bold text-zinc-900">Contas Pendentes</h2>}
+                <p className="text-zinc-500 text-sm mt-1">{tab === 'pagos' ? 'Contas já quitadas neste ciclo' : 'Prioridade automática baseada no vencimento'}</p>
               </div>
               <div className="flex items-center gap-3 flex-wrap">
                 <button
@@ -437,7 +430,7 @@ export default function FinanceFlow() {
               {filteredContas.map(conta => {
                 const priority = getPriority(conta)
                 const days = getDaysRemaining(conta.vencimento)
-                const isPagoRecente = pagosRecentes.has(conta.id)
+                const isPagoRecente = false
                 return (
                   <div
                     key={conta.id}
@@ -465,7 +458,7 @@ export default function FinanceFlow() {
                       {!isPagoRecente && (
                         <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
                           <span>💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span></span>
-                          <span>📅 <span className="font-semibold text-zinc-800">{new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span></span>
+                          <span>📅 <span className="font-semibold text-zinc-800">Dia {String(new Date(conta.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</span></span>
                           <span className={days <= 1 && conta.status !== 'Pago' ? 'text-red-600 font-semibold' : ''}>
                             ⏰ {conta.status === 'Pago' ? 'Pago' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
                           </span>
@@ -543,7 +536,7 @@ export default function FinanceFlow() {
               {vencimentosSorted.map((conta, idx) => {
                 const color = getVencimentoColor(conta)
                 const days = getDaysRemaining(conta.vencimento)
-                const isPagoRecente = pagosRecentes.has(conta.id)
+                const isPagoRecente = false
 
                 const rowBg: Record<string, string> = {
                   red: 'bg-red-100 hover:bg-red-200/70 border-l-4 border-l-red-500',
@@ -581,7 +574,7 @@ export default function FinanceFlow() {
                       ? <span className="text-emerald-600 text-sm font-semibold animate-pulse flex-shrink-0">✓ Renovando...</span>
                       : <>
                           <span className="text-zinc-700 font-semibold text-sm hidden sm:block flex-shrink-0">{formatMoney(conta.valor)}</span>
-                          <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>📅 {new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}</span>
+                          <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>📅 Dia {String(new Date(conta.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</span>
                           <span className={`px-3 py-1 rounded-full text-xs font-bold border flex-shrink-0 ${badgeBg[color]}`}>{statusLabel[color]}</span>
                           <select
                             value={conta.status}
