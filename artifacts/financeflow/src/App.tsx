@@ -118,28 +118,17 @@ export default function FinanceFlow() {
 
   useEffect(() => {
     try {
-      const savedVersion = localStorage.getItem('financeflow-version')
-      if (savedVersion !== APP_VERSION) {
-        localStorage.removeItem('financeflow-contas')
-        localStorage.removeItem('financeflow-deleted')
-        localStorage.setItem('financeflow-version', APP_VERSION)
-        setContas(DEFAULT_CONTAS)
-        setDeletedNomes([])
-        return
-      }
       const savedDeleted: string[] = JSON.parse(localStorage.getItem('financeflow-deleted') || '[]')
       setDeletedNomes(savedDeleted)
       const saved = localStorage.getItem('financeflow-contas')
-      if (saved) {
-        const parsed: Conta[] = JSON.parse(saved)
-        const merged = [
-          ...DEFAULT_CONTAS.filter(d => !parsed.some(p => p.nome === d.nome) && !savedDeleted.includes(d.nome)),
-          ...parsed,
-        ]
-        setContas(merged)
-      } else {
-        setContas(DEFAULT_CONTAS.filter(d => !savedDeleted.includes(d.nome)))
-      }
+      const parsed: Conta[] = saved ? JSON.parse(saved) : []
+      // Adiciona apenas contas novas que ainda não existem (por nome) e não foram deletadas
+      const novas = DEFAULT_CONTAS.filter(
+        d => !parsed.some(p => p.nome === d.nome) && !savedDeleted.includes(d.nome)
+      )
+      const merged = [...parsed, ...novas]
+      setContas(merged.length > 0 ? merged : DEFAULT_CONTAS)
+      localStorage.setItem('financeflow-version', APP_VERSION)
     } catch { /* ignore */ }
   }, [])
 
