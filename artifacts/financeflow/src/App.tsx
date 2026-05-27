@@ -24,69 +24,69 @@ interface RegistroPagamento {
 const APP_VERSION = '2.0'
 
 const DEFAULT_CONTAS: Conta[] = [
-  { id: 1,  nome: 'SISTEMA SIGE',                                   valor: 673.20,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-01', status: 'Pendente' },
-  { id: 2,  nome: 'OLIMPIO ERICK (mensal)',                          valor: 53.00,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-01', status: 'Pendente' },
-  { id: 3,  nome: 'ADVOGADA ROBERTA',                                valor: 1900.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-03', status: 'Pendente' },
-  { id: 4,  nome: 'SABESP AGUA DALMO',                               valor: 791.78,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-03', status: 'Pendente' },
-  { id: 5,  nome: 'PLANO DE SAUDE PORTO',                            valor: 10531.86,  tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 6,  nome: 'METROMED ELEVADORES (vence 5)',                   valor: 1459.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 7,  nome: 'DI LIFE SALA DE PROJETOS',                        valor: 114.99,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 8,  nome: 'DI LIFE ELEVADORES',                              valor: 149.99,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'Pendente' },
-  { id: 9,  nome: 'ENERGIA BRÁS',                                    valor: 150.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-06', status: 'Pendente' },
-  { id: 10, nome: 'IPTU SP',                                         valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-09', status: 'Pendente' },
-  { id: 11, nome: 'ARIANE IPTU',                                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-09', status: 'Pendente' },
-  { id: 12, nome: 'ELEVADORES IPTU',                                 valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-09', status: 'Pendente' },
-  { id: 13, nome: 'PLANO DE SAUDE NOTRE DAME (1)',                   valor: 2888.86,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 14, nome: 'PLANO DE SAUDE NOTRE DAME (2)',                   valor: 3141.09,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 15, nome: 'ESCOLA CLARA',                                    valor: 810.20,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 16, nome: 'ROTAEXATA',                                       valor: 806.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 17, nome: 'CURSO S.K',                                       valor: 379.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 18, nome: 'UNIVERSO ONLINE ATÉ JULHO',                       valor: 111.88,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'Pendente' },
-  { id: 19, nome: 'PSICOLOGA NANCY',                                 valor: 1500.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-12', status: 'Pendente' },
-  { id: 20, nome: 'JOSÉ PROCESSO',                                   valor: 3000.00,   tipo: 'Quinzenal', criada: '2026-05-01', vencimento: '2026-06-12', status: 'Pendente' },
-  { id: 21, nome: 'SABESP AGUA BRÁS',                                valor: 88.64,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-14', status: 'Pendente' },
-  { id: 22, nome: 'ASSINATURA INFOJOBS ATÉ 19/08',                   valor: 299.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
-  { id: 23, nome: 'GOTO',                                            valor: 570.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
-  { id: 24, nome: 'TELEFONE VIVO-SERRALHERIA FIBRA 300',             valor: 82.32,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'Pendente' },
-  { id: 25, nome: 'SABESP AGUA EDMUNDO',                             valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-16', status: 'Pendente' },
-  { id: 26, nome: 'CARTÃO CAIXA',                                    valor: 3000.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-16', status: 'Pendente' },
-  { id: 27, nome: 'TELEFONE VIVO-QUETER/FUZA-99937-0069',            valor: 180.76,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-17', status: 'Pendente' },
-  { id: 28, nome: 'TELEFONE VIVO-SERRALHERIA 4 CHIPS',               valor: 220.78,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-17', status: 'Pendente' },
-  { id: 29, nome: 'METROMED ELEVADORES (vence 19)',                  valor: 2466.20,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-19', status: 'Pendente' },
-  { id: 30, nome: 'CONSIGAS',                                        valor: 55.00,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-19', status: 'Pendente' },
-  { id: 31, nome: 'CONT ANDERSON ALEX ALENCAR HOLDING',              valor: 5000.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 32, nome: 'CONTABILIDADE ANDERSON ALEX ALENCAR ELEVADORES',  valor: 1800.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-20', status: 'Pago' },
-  { id: 33, nome: 'CONTABILIDADE ANDERSON ALEX ALENCAR MANUTENÇÃO',  valor: 1200.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-20', status: 'Pago' },
-  { id: 34, nome: 'CONTABILIDADE ANDERSON ALEX ALENCAR SERRALHERIA', valor: 554.75,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-20', status: 'Pago' },
-  { id: 35, nome: 'LOVELY ALUGUEL BRÁS',                             valor: 1500.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 36, nome: 'QUADRA DE FUTEBOL',                               valor: 350.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 37, nome: 'ENEL ENERGIA EDMUNDO',                            valor: 1800.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 38, nome: 'ELEKTRO NEOENERGIA',                              valor: 130.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 39, nome: 'FOMENT CONNECTION',                               valor: 3600.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 40, nome: 'IPTU BERTIOGA',                                   valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 41, nome: 'ARIANE DAS SIMPLES NACIONAL',                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 42, nome: 'ARIANE DARF UNIFICADA',                           valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 43, nome: 'ARIANE FGTS/RECISÓRIO',                           valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 44, nome: 'ELEVADORES DAS SIMPLES NACIONAL',                 valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 45, nome: 'ELEVADORES DARF UNIFICADA',                       valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 46, nome: 'ELEVADORES FGTS/RECISÓRIO',                       valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'Pendente' },
-  { id: 47, nome: 'TELEFONE VIVO-MANUTENÇÃO-FIBRA 300',              valor: 87.02,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-21', status: 'Pendente' },
-  { id: 48, nome: 'AUVO',                                            valor: 826.74,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'Pendente' },
-  { id: 49, nome: 'CONDOMINIO BURITI',                               valor: 1424.60,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'Pendente' },
-  { id: 50, nome: 'ALUGUEL IMPRESSORA MA MAX',                       valor: 830.35,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'Pendente' },
-  { id: 51, nome: 'REP RELOGIOS',                                    valor: 447.80,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'Pendente' },
-  { id: 52, nome: 'TELEFONE VIVO-ELEVADORES-31 CHIPS',               valor: 1331.72,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'Pendente' },
-  { id: 53, nome: 'OLIMPIO ERICK (semanal)',                         valor: 875.00,    tipo: 'Semanal',   criada: '2026-05-01', vencimento: '2026-05-29', status: 'Pendente' },
-  { id: 54, nome: 'CABELO ANDERSON DEOMIRO',                         valor: 750.00,    tipo: 'Semanal',   criada: '2026-05-01', vencimento: '2026-05-29', status: 'Pendente' },
-  { id: 55, nome: 'METROMED MANUTENÇÃO',                             valor: 1641.60,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 56, nome: 'ESCOLA DANIEL',                                   valor: 917.84,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 57, nome: 'ESCOLA SAMUEL',                                   valor: 874.79,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 58, nome: 'CAPRICE',                                         valor: 130.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 59, nome: 'ELEVADORES ICMS',                                 valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 60, nome: 'ELEVADORES ACORDO DARF PREV',                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 61, nome: 'ELEVADORES ACORDO PARCELADO',                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 62, nome: 'ELEVADORES ACORDO 2021',                          valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
-  { id: 63, nome: 'ELEVADORES ACORDO PGFN',                          valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'Pendente' },
+  { id: 1,  nome: 'SISTEMA SIGE',                                   valor: 673.20,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-01', status: 'A Vencer' },
+  { id: 2,  nome: 'OLIMPIO ERICK (mensal)',                          valor: 53.00,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-01', status: 'A Vencer' },
+  { id: 3,  nome: 'ADVOGADA ROBERTA',                                valor: 1900.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-03', status: 'A Vencer' },
+  { id: 4,  nome: 'SABESP AGUA DALMO',                               valor: 791.78,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-03', status: 'A Vencer' },
+  { id: 5,  nome: 'PLANO DE SAUDE PORTO',                            valor: 10531.86,  tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'A Vencer' },
+  { id: 6,  nome: 'METROMED ELEVADORES (vence 5)',                   valor: 1459.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'A Vencer' },
+  { id: 7,  nome: 'DI LIFE SALA DE PROJETOS',                        valor: 114.99,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'A Vencer' },
+  { id: 8,  nome: 'DI LIFE ELEVADORES',                              valor: 149.99,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-05', status: 'A Vencer' },
+  { id: 9,  nome: 'ENERGIA BRÁS',                                    valor: 150.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-06', status: 'A Vencer' },
+  { id: 10, nome: 'IPTU SP',                                         valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-09', status: 'A Vencer' },
+  { id: 11, nome: 'ARIANE IPTU',                                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-09', status: 'A Vencer' },
+  { id: 12, nome: 'ELEVADORES IPTU',                                 valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-09', status: 'A Vencer' },
+  { id: 13, nome: 'PLANO DE SAUDE NOTRE DAME (1)',                   valor: 2888.86,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'A Vencer' },
+  { id: 14, nome: 'PLANO DE SAUDE NOTRE DAME (2)',                   valor: 3141.09,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'A Vencer' },
+  { id: 15, nome: 'ESCOLA CLARA',                                    valor: 810.20,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'A Vencer' },
+  { id: 16, nome: 'ROTAEXATA',                                       valor: 806.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'A Vencer' },
+  { id: 17, nome: 'CURSO S.K',                                       valor: 379.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'A Vencer' },
+  { id: 18, nome: 'UNIVERSO ONLINE ATÉ JULHO',                       valor: 111.88,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-10', status: 'A Vencer' },
+  { id: 19, nome: 'PSICOLOGA NANCY',                                 valor: 1500.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-12', status: 'A Vencer' },
+  { id: 20, nome: 'JOSÉ PROCESSO',                                   valor: 3000.00,   tipo: 'Quinzenal', criada: '2026-05-01', vencimento: '2026-06-12', status: 'A Vencer' },
+  { id: 21, nome: 'SABESP AGUA BRÁS',                                valor: 88.64,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-14', status: 'A Vencer' },
+  { id: 22, nome: 'ASSINATURA INFOJOBS ATÉ 19/08',                   valor: 299.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'A Vencer' },
+  { id: 23, nome: 'GOTO',                                            valor: 570.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'A Vencer' },
+  { id: 24, nome: 'TELEFONE VIVO-SERRALHERIA FIBRA 300',             valor: 82.32,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-15', status: 'A Vencer' },
+  { id: 25, nome: 'SABESP AGUA EDMUNDO',                             valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-16', status: 'A Vencer' },
+  { id: 26, nome: 'CARTÃO CAIXA',                                    valor: 3000.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-16', status: 'A Vencer' },
+  { id: 27, nome: 'TELEFONE VIVO-QUETER/FUZA-99937-0069',            valor: 180.76,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-17', status: 'A Vencer' },
+  { id: 28, nome: 'TELEFONE VIVO-SERRALHERIA 4 CHIPS',               valor: 220.78,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-17', status: 'A Vencer' },
+  { id: 29, nome: 'METROMED ELEVADORES (vence 19)',                  valor: 2466.20,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-19', status: 'A Vencer' },
+  { id: 30, nome: 'CONSIGAS',                                        valor: 55.00,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-19', status: 'A Vencer' },
+  { id: 31, nome: 'CONT ANDERSON ALEX ALENCAR HOLDING',              valor: 5000.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 32, nome: 'CONTABILIDADE ANDERSON ALEX ALENCAR ELEVADORES',  valor: 1800.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-20', status: 'Vencido' },
+  { id: 33, nome: 'CONTABILIDADE ANDERSON ALEX ALENCAR MANUTENÇÃO',  valor: 1200.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-20', status: 'Vencido' },
+  { id: 34, nome: 'CONTABILIDADE ANDERSON ALEX ALENCAR SERRALHERIA', valor: 554.75,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-20', status: 'Vencido' },
+  { id: 35, nome: 'LOVELY ALUGUEL BRÁS',                             valor: 1500.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 36, nome: 'QUADRA DE FUTEBOL',                               valor: 350.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 37, nome: 'ENEL ENERGIA EDMUNDO',                            valor: 1800.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 38, nome: 'ELEKTRO NEOENERGIA',                              valor: 130.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 39, nome: 'FOMENT CONNECTION',                               valor: 3600.00,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 40, nome: 'IPTU BERTIOGA',                                   valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 41, nome: 'ARIANE DAS SIMPLES NACIONAL',                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 42, nome: 'ARIANE DARF UNIFICADA',                           valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 43, nome: 'ARIANE FGTS/RECISÓRIO',                           valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 44, nome: 'ELEVADORES DAS SIMPLES NACIONAL',                 valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 45, nome: 'ELEVADORES DARF UNIFICADA',                       valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 46, nome: 'ELEVADORES FGTS/RECISÓRIO',                       valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-20', status: 'A Vencer' },
+  { id: 47, nome: 'TELEFONE VIVO-MANUTENÇÃO-FIBRA 300',              valor: 87.02,     tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-06-21', status: 'A Vencer' },
+  { id: 48, nome: 'AUVO',                                            valor: 826.74,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'A Vencer' },
+  { id: 49, nome: 'CONDOMINIO BURITI',                               valor: 1424.60,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'A Vencer' },
+  { id: 50, nome: 'ALUGUEL IMPRESSORA MA MAX',                       valor: 830.35,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'A Vencer' },
+  { id: 51, nome: 'REP RELOGIOS',                                    valor: 447.80,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'A Vencer' },
+  { id: 52, nome: 'TELEFONE VIVO-ELEVADORES-31 CHIPS',               valor: 1331.72,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-25', status: 'A Vencer' },
+  { id: 53, nome: 'OLIMPIO ERICK (semanal)',                         valor: 875.00,    tipo: 'Semanal',   criada: '2026-05-01', vencimento: '2026-05-29', status: 'A Vencer' },
+  { id: 54, nome: 'CABELO ANDERSON DEOMIRO',                         valor: 750.00,    tipo: 'Semanal',   criada: '2026-05-01', vencimento: '2026-05-29', status: 'A Vencer' },
+  { id: 55, nome: 'METROMED MANUTENÇÃO',                             valor: 1641.60,   tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 56, nome: 'ESCOLA DANIEL',                                   valor: 917.84,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 57, nome: 'ESCOLA SAMUEL',                                   valor: 874.79,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 58, nome: 'CAPRICE',                                         valor: 130.00,    tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 59, nome: 'ELEVADORES ICMS',                                 valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 60, nome: 'ELEVADORES ACORDO DARF PREV',                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 61, nome: 'ELEVADORES ACORDO PARCELADO',                     valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 62, nome: 'ELEVADORES ACORDO 2021',                          valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
+  { id: 63, nome: 'ELEVADORES ACORDO PGFN',                          valor: 0,         tipo: 'Mensal',    criada: '2026-05-01', vencimento: '2026-05-30', status: 'A Vencer' },
 ]
 
 const EMPTY_FORM = {
@@ -95,7 +95,7 @@ const EMPTY_FORM = {
   tipo: 'Mensal',
   criada: '',
   vencimento: '',
-  status: 'Pendente',
+  status: 'A Vencer',
 }
 
 type Tab = 'vencidos' | 'avencer' | 'solicitado' | 'vencimentos'
@@ -179,17 +179,17 @@ export default function FinanceFlow() {
   useEffect(() => {
     if (alertadoRef.current) return
     const urgentes = contas.filter(c => {
-      if (c.status === 'Pago') return false
+      if (c.status === 'Vencido') return false
       const days = getDaysRemaining(c.vencimento)
       return days <= 0
     })
     const hoje = contas.filter(c => {
-      if (c.status === 'Pago') return false
+      if (c.status === 'Vencido') return false
       const days = getDaysRemaining(c.vencimento)
       return days === 0
     })
     const alerta = contas.filter(c => {
-      if (c.status === 'Pago') return false
+      if (c.status === 'Vencido') return false
       const days = getDaysRemaining(c.vencimento)
       return days <= 3
     })
@@ -217,7 +217,7 @@ export default function FinanceFlow() {
   }
 
   const getVencimentoColor = (conta: Conta): 'red' | 'yellow' | 'blue' | 'green' | 'default' => {
-    if (conta.status === 'Pago') return 'green'
+    if (conta.status === 'Vencido') return 'green'
     if (conta.status === 'Solicitado') return 'blue'
     const days = getDaysRemaining(conta.vencimento)
     if (days <= 0) return 'red'
@@ -226,7 +226,7 @@ export default function FinanceFlow() {
   }
 
   const getPriority = (conta: Conta) => {
-    if (conta.status === 'Pago') return { label: 'Pago', color: 'green' }
+    if (conta.status === 'Vencido') return { label: 'Vencido', color: 'green' }
     const days = getDaysRemaining(conta.vencimento)
     if (days <= 1) return { label: 'URGENTE', color: 'red' }
     if (days <= 5) return { label: 'PRÓXIMO', color: 'yellow' }
@@ -247,10 +247,10 @@ export default function FinanceFlow() {
 
   const filteredContas = useMemo(() => {
     const byTab = contas.filter(c => {
-      if (c.status === 'Pago') return false
+      if (c.status === 'Vencido') return false
       const days = getDaysRemaining(c.vencimento)
-      if (tab === 'vencidos') return c.status === 'Pendente' && days <= 0
-      if (tab === 'avencer') return c.status === 'Pendente' && days > 0
+      if (tab === 'vencidos') return c.status === 'A Vencer' && days <= 0
+      if (tab === 'avencer') return c.status === 'A Vencer' && days > 0
       if (tab === 'solicitado') return c.status === 'Solicitado'
       return false
     })
@@ -271,7 +271,7 @@ export default function FinanceFlow() {
 
   const urgentAccounts = contas.filter(c => getPriority(c).label === 'URGENTE')
   const nextAccounts = contas.filter(c => getPriority(c).label === 'PRÓXIMO')
-  const paidAccounts = contas.filter(c => c.status === 'Pago')
+  const paidAccounts = contas.filter(c => c.status === 'Vencido')
   const totalMonth = contas.reduce((acc, c) => acc + (c.valor || 0), 0)
 
   const handleSubmit = () => {
@@ -307,7 +307,7 @@ export default function FinanceFlow() {
   }
 
   const handleStatusChange = (conta: Conta, newStatus: string) => {
-    if (newStatus === 'Pago' && conta.status !== 'Pago') {
+    if (newStatus === 'Vencido' && conta.status !== 'Vencido') {
       const agora = new Date()
       const registro: RegistroPagamento = {
         id: Date.now(),
@@ -357,7 +357,7 @@ export default function FinanceFlow() {
     const base = size === 'normal'
       ? 'rounded-xl text-sm font-semibold outline-none border transition-colors cursor-pointer px-4 py-2.5'
       : 'rounded-xl text-xs font-semibold outline-none border transition-colors cursor-pointer px-3 py-2'
-    const color = status === 'Pago'
+    const color = status === 'Vencido'
       ? 'bg-emerald-500 border-emerald-600 text-white'
       : status === 'Solicitado'
       ? 'bg-blue-500 border-blue-600 text-white'
@@ -473,7 +473,7 @@ export default function FinanceFlow() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <SummaryCard emoji="🔥" label="Urgentes" value={String(urgentAccounts.length)} accent="red" />
           <SummaryCard emoji="⚠️" label="Próximas" value={String(nextAccounts.length)} accent="yellow" />
-          <SummaryCard emoji="✅" label="Pagas" value={String(paidAccounts.length)} accent="green" />
+          <SummaryCard emoji="✅" label="Vencidos" value={String(paidAccounts.length)} accent="green" />
           <SummaryCard emoji="💰" label="Total do Mês" value={formatMoney(totalMonth)} accent="blue" />
         </div>
 
@@ -486,7 +486,7 @@ export default function FinanceFlow() {
             }`}
           >
             <Bell size={16} />
-            Vencidos ({contas.filter(c => c.status === 'Pendente' && getDaysRemaining(c.vencimento) <= 0).length})
+            Vencidos ({contas.filter(c => c.status === 'A Vencer' && getDaysRemaining(c.vencimento) <= 0).length})
           </button>
           <button
             onClick={() => setTab('avencer')}
@@ -495,7 +495,7 @@ export default function FinanceFlow() {
             }`}
           >
             <List size={16} />
-            A Vencer ({contas.filter(c => c.status === 'Pendente' && getDaysRemaining(c.vencimento) > 0).length})
+            A Vencer ({contas.filter(c => c.status === 'A Vencer' && getDaysRemaining(c.vencimento) > 0).length})
           </button>
           <button
             onClick={() => setTab('solicitado')}
@@ -584,8 +584,8 @@ export default function FinanceFlow() {
                         <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
                           <span>💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span></span>
                           <span>📅 <span className="font-semibold text-zinc-800">Dia {String(new Date(conta.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</span></span>
-                          <span className={days <= 1 && conta.status !== 'Pago' ? 'text-red-600 font-semibold' : ''}>
-                            ⏰ {conta.status === 'Pago' ? 'Pago' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
+                          <span className={days <= 1 && conta.status !== 'Vencido' ? 'text-red-600 font-semibold' : ''}>
+                            ⏰ {conta.status === 'Vencido' ? 'Vencido' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
                           </span>
                         </div>
                       )}
@@ -598,8 +598,8 @@ export default function FinanceFlow() {
                           onChange={e => handleStatusChange(conta, e.target.value)}
                           className={statusSelectClass(conta.status)}
                         >
-                          <option value="Pendente">Pendente</option>
-                          <option value="Pago">Pago</option>
+                          <option value="A Vencer">A Vencer</option>
+                          <option value="Vencido">Vencido</option>
                           <option value="Solicitado">Solicitado</option>
                         </select>
 
@@ -677,7 +677,7 @@ export default function FinanceFlow() {
                   red: 'text-red-800 font-bold', yellow: 'text-yellow-800 font-bold', blue: 'text-blue-800 font-semibold', green: 'text-emerald-800 font-semibold', default: 'text-zinc-700 font-semibold',
                 }
                 const statusLabel: Record<string, string> = {
-                  red: days <= 0 ? 'VENCIDO' : 'VENCE HOJE', yellow: `${days} dias`, blue: 'Solicitado', green: 'Pago', default: `${days} dias`,
+                  red: days <= 0 ? 'VENCIDO' : 'VENCE HOJE', yellow: `${days} dias`, blue: 'Solicitado', green: 'Vencido', default: `${days} dias`,
                 }
                 const badgeBg: Record<string, string> = {
                   red: 'bg-red-600 text-white border-red-700', yellow: 'bg-yellow-500 text-white border-yellow-600', blue: 'bg-blue-600 text-white border-blue-700', green: 'bg-emerald-600 text-white border-emerald-700', default: 'bg-zinc-200 text-zinc-700 border-zinc-300',
@@ -706,8 +706,8 @@ export default function FinanceFlow() {
                             onChange={e => handleStatusChange(conta, e.target.value)}
                             className={`flex-shrink-0 ${statusSelectClass(conta.status, 'small')}`}
                           >
-                            <option value="Pendente">Pendente</option>
-                            <option value="Pago">Pago</option>
+                            <option value="A Vencer">A Vencer</option>
+                            <option value="Vencido">Vencido</option>
                             <option value="Solicitado">Solicitado</option>
                           </select>
                         </>
@@ -900,7 +900,7 @@ export default function FinanceFlow() {
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-400/50 text-zinc-900 text-sm transition-all cursor-pointer"
               >
                 <option>Pendente</option>
-                <option>Pago</option>
+                <option value="Vencido">Vencido</option>
                 <option>Solicitado</option>
               </select>
             </FormField>
