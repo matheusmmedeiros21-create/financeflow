@@ -406,8 +406,9 @@ export default function FinanceFlow() {
   return (
     <div className={`min-h-screen relative overflow-x-hidden transition-colors duration-300 ${darkMode ? 'bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100'}`}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-emerald-400/20 blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-blue-400/15 blur-3xl" />
+        <div className="absolute -top-60 -left-60 w-[600px] h-[600px] rounded-full bg-emerald-300/20 blur-[140px]" />
+        <div className="absolute -bottom-60 -right-60 w-[600px] h-[600px] rounded-full bg-blue-300/15 blur-[140px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-200/10 blur-[160px]" />
       </div>
 
       {/* Alerta de Vencimentos */}
@@ -577,7 +578,7 @@ export default function FinanceFlow() {
 
         {/* Tab: Vencidos / A Vencer / Solicitado */}
         {(tab === 'vencidos' || tab === 'avencer' || tab === 'solicitado') && (
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="bg-white/75 backdrop-blur-3xl border border-white/80 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] ring-1 ring-white/60 overflow-hidden">
             <div className="px-8 py-6 border-b border-zinc-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 {tab === 'vencidos' && <h2 className="text-2xl font-bold text-red-700">🔴 Contas Vencidas</h2>}
@@ -703,7 +704,7 @@ export default function FinanceFlow() {
 
         {/* Tab: Lista de Vencimentos */}
         {tab === 'vencimentos' && (
-          <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+          <div className="bg-white/75 backdrop-blur-3xl border border-white/80 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] ring-1 ring-white/60 overflow-hidden">
             <div className="px-8 py-6 border-b border-zinc-200/60">
               <h2 className="text-2xl font-bold text-zinc-900">Lista de Vencimentos</h2>
               <p className="text-zinc-500 text-sm mt-1">Ordenado por data de vencimento</p>
@@ -814,7 +815,7 @@ export default function FinanceFlow() {
           return (
             <div className="space-y-6">
               {/* Calendário */}
-              <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-white/75 backdrop-blur-3xl border border-white/80 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] ring-1 ring-white/60 overflow-hidden">
                 <div className="px-6 py-5 border-b border-zinc-200/60 flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-zinc-900">📅 Calendário</h2>
@@ -928,7 +929,7 @@ export default function FinanceFlow() {
               </div>
 
               {/* Solicitados */}
-              <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-white/75 backdrop-blur-3xl border border-white/80 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] ring-1 ring-white/60 overflow-hidden">
                 <div className="px-6 py-5 border-b border-zinc-200/60">
                   <h2 className="text-xl font-bold text-blue-700">🔵 Solicitados</h2>
                   <p className="text-zinc-500 text-sm mt-0.5">Boletos já enviados aguardando pagamento</p>
@@ -956,7 +957,7 @@ export default function FinanceFlow() {
               </div>
 
               {/* A Vencer completo */}
-              <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+              <div className="bg-white/75 backdrop-blur-3xl border border-white/80 rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.10)] ring-1 ring-white/60 overflow-hidden">
                 <div className="px-6 py-5 border-b border-zinc-200/60">
                   <h2 className="text-xl font-bold text-zinc-800">📋 Todas as contas a vencer</h2>
                   <p className="text-zinc-500 text-sm mt-0.5">Lista completa — {aVencer.length} contas</p>
