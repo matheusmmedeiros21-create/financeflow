@@ -9,6 +9,7 @@ interface Conta {
   criada: string
   vencimento: string
   status: string
+  solicitadoEm?: string
 }
 
 interface RegistroPagamento {
@@ -98,7 +99,7 @@ const EMPTY_FORM = {
   status: 'A Vencer',
 }
 
-type Tab = 'vencidos' | 'avencer' | 'solicitado' | 'vencimentos'
+type Tab = 'vencidos' | 'avencer' | 'solicitado' | 'vencimentos' | 'historico'
 
 export default function FinanceFlow() {
   const [tab, setTab] = useState<Tab>('avencer')
@@ -115,6 +116,8 @@ export default function FinanceFlow() {
   const [manualForm, setManualForm] = useState({ valor: '', data: '', obs: '' })
   const [showAlerta, setShowAlerta] = useState(false)
   const [alertaContas, setAlertaContas] = useState<Conta[]>([])
+  const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); return { month: d.getMonth(), year: d.getFullYear() } })
+  const [calendarDiaSelecionado, setCalendarDiaSelecionado] = useState<number | null>(null)
   const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
   const alertadoRef = useRef(false)
 
@@ -321,7 +324,10 @@ export default function FinanceFlow() {
         [conta.nome]: [...(prev[conta.nome] || []), registro],
       }))
     }
-    setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus } : c))
+    const solicitadoEm = newStatus === 'Solicitado' && conta.status !== 'Solicitado'
+      ? new Date().toISOString()
+      : conta.solicitadoEm
+    setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus, solicitadoEm } : c))
   }
 
   const deleteHistoricoEntry = (nomeConta: string, registroId: number) => {
@@ -513,6 +519,15 @@ export default function FinanceFlow() {
           >
             <CalendarClock size={16} />
             Vencimentos
+          </button>
+          <button
+            onClick={() => setTab('historico')}
+            className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-semibold text-sm transition-all ${
+              tab === 'historico' ? 'bg-purple-600 text-white shadow-lg' : 'bg-white/60 text-zinc-600 hover:bg-white/80 border border-white/50'
+            }`}
+          >
+            <CalendarClock size={16} />
+            Histórico
           </button>
         </div>
 
@@ -717,6 +732,208 @@ export default function FinanceFlow() {
             </div>
           </div>
         )}
+
+        {/* Tab: Histórico */}
+        {tab === 'historico' && (() => {
+          const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+          const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+          const { month, year } = calendarDate
+          const primeiroDia = new Date(year, month, 1).getDay()
+          const totalDias = new Date(year, month + 1, 0).getDate()
+          const hoje = new Date()
+
+          const contasDoDia = (dia: number) =>
+            contas.filter(c => {
+              const d = new Date(c.vencimento + 'T12:00:00')
+              return d.getFullYear() === year && d.getMonth() === month && d.getDate() === dia
+            })
+
+          const solicitados = contas
+            .filter(c => c.status === 'Solicitado')
+            .sort((a, b) => (b.solicitadoEm || '').localeCompare(a.solicitadoEm || ''))
+
+          const aVencer = contas
+            .filter(c => c.status === 'A Vencer')
+            .sort((a, b) => new Date(a.vencimento + 'T12:00:00').getTime() - new Date(b.vencimento + 'T12:00:00').getTime())
+
+          const diasSelecionadosContas = calendarDiaSelecionado !== null ? contasDoDia(calendarDiaSelecionado) : []
+
+          return (
+            <div className="space-y-6">
+              {/* Calendário */}
+              <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+                <div className="px-6 py-5 border-b border-zinc-200/60 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-zinc-900">📅 Calendário</h2>
+                    <p className="text-zinc-500 text-sm mt-0.5">Veja as contas por dia do mês</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        setCalendarDiaSelecionado(null)
+                        setCalendarDate(p => {
+                          const m = p.month === 0 ? 11 : p.month - 1
+                          const y = p.month === 0 ? p.year - 1 : p.year
+                          return { month: m, year: y }
+                        })
+                      }}
+                      className="w-9 h-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold transition-colors"
+                    >‹</button>
+                    <span className="font-bold text-zinc-800 min-w-[140px] text-center">{meses[month]} {year}</span>
+                    <button
+                      onClick={() => {
+                        setCalendarDiaSelecionado(null)
+                        setCalendarDate(p => {
+                          const m = p.month === 11 ? 0 : p.month + 1
+                          const y = p.month === 11 ? p.year + 1 : p.year
+                          return { month: m, year: y }
+                        })
+                      }}
+                      className="w-9 h-9 rounded-xl bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center text-zinc-600 font-bold transition-colors"
+                    >›</button>
+                  </div>
+                </div>
+
+                <div className="p-4">
+                  {/* Dias da semana */}
+                  <div className="grid grid-cols-7 mb-2">
+                    {diasSemana.map(d => (
+                      <div key={d} className="text-center text-xs font-semibold text-zinc-400 py-1">{d}</div>
+                    ))}
+                  </div>
+                  {/* Células do calendário */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {Array.from({ length: primeiroDia }).map((_, i) => <div key={`empty-${i}`} />)}
+                    {Array.from({ length: totalDias }).map((_, i) => {
+                      const dia = i + 1
+                      const contasDia = contasDoDia(dia)
+                      const isHoje = hoje.getDate() === dia && hoje.getMonth() === month && hoje.getFullYear() === year
+                      const isSelecionado = calendarDiaSelecionado === dia
+                      const temSolicitado = contasDia.some(c => c.status === 'Solicitado')
+                      const temVencido = contasDia.some(c => c.status === 'A Vencer' && getDaysRemaining(c.vencimento) <= 0)
+                      const temAvencer = contasDia.some(c => c.status === 'A Vencer' && getDaysRemaining(c.vencimento) > 0)
+                      return (
+                        <button
+                          key={dia}
+                          onClick={() => setCalendarDiaSelecionado(isSelecionado ? null : dia)}
+                          className={`relative flex flex-col items-center justify-start py-1.5 rounded-xl min-h-[52px] transition-all text-sm font-semibold
+                            ${isSelecionado ? 'bg-purple-600 text-white shadow-lg' : isHoje ? 'bg-purple-100 text-purple-700 ring-2 ring-purple-400' : contasDia.length > 0 ? 'bg-zinc-50 hover:bg-zinc-100 text-zinc-800' : 'text-zinc-400 hover:bg-zinc-50'}
+                          `}
+                        >
+                          <span>{dia}</span>
+                          {contasDia.length > 0 && (
+                            <div className="flex gap-0.5 mt-1 flex-wrap justify-center">
+                              {temVencido && <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />}
+                              {temSolicitado && <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />}
+                              {temAvencer && <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />}
+                            </div>
+                          )}
+                          {contasDia.length > 0 && (
+                            <span className={`text-[10px] font-bold mt-0.5 ${isSelecionado ? 'text-white/80' : 'text-zinc-500'}`}>{contasDia.length}</span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Legenda */}
+                  <div className="flex gap-4 mt-4 px-1 flex-wrap">
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-500"><span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" />Vencido</div>
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-500"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block" />Solicitado</div>
+                    <div className="flex items-center gap-1.5 text-xs text-zinc-500"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />A Vencer</div>
+                  </div>
+                </div>
+
+                {/* Contas do dia selecionado */}
+                {calendarDiaSelecionado !== null && (
+                  <div className="border-t border-zinc-200/60 px-6 py-4">
+                    <h3 className="font-bold text-zinc-800 mb-3">
+                      Dia {String(calendarDiaSelecionado).padStart(2, '0')} de {meses[month]}
+                      <span className="ml-2 text-zinc-500 font-normal text-sm">
+                        {diasSelecionadosContas.length === 0 ? '— nenhuma conta' : `— ${diasSelecionadosContas.length} conta(s)`}
+                      </span>
+                    </h3>
+                    {diasSelecionadosContas.length === 0
+                      ? <p className="text-zinc-400 text-sm">Nenhuma conta vence neste dia.</p>
+                      : (
+                        <div className="space-y-2">
+                          {diasSelecionadosContas.map(c => {
+                            const statusColor = c.status === 'Solicitado' ? 'bg-blue-100 text-blue-700 border-blue-200' : c.status === 'A Vencer' && getDaysRemaining(c.vencimento) <= 0 ? 'bg-red-100 text-red-700 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                            return (
+                              <div key={c.id} className="flex items-center justify-between bg-white rounded-xl px-4 py-3 border border-zinc-100 shadow-sm gap-3">
+                                <span className="font-semibold text-zinc-800 text-sm truncate flex-1">{c.nome}</span>
+                                <span className="text-zinc-600 text-sm font-medium flex-shrink-0">{formatMoney(c.valor)}</span>
+                                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${statusColor}`}>{c.status}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )
+                    }
+                  </div>
+                )}
+              </div>
+
+              {/* Solicitados */}
+              <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+                <div className="px-6 py-5 border-b border-zinc-200/60">
+                  <h2 className="text-xl font-bold text-blue-700">🔵 Solicitados</h2>
+                  <p className="text-zinc-500 text-sm mt-0.5">Boletos já enviados aguardando pagamento</p>
+                </div>
+                <div className="divide-y divide-zinc-100">
+                  {solicitados.length === 0
+                    ? <p className="px-6 py-6 text-zinc-400 text-sm">Nenhum boleto solicitado ainda.</p>
+                    : solicitados.map(c => (
+                      <div key={c.id} className="flex items-center gap-3 px-6 py-4 hover:bg-blue-50/40 transition-colors">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-zinc-800 truncate">{c.nome}</p>
+                          <p className="text-xs text-zinc-400 mt-0.5">
+                            {c.solicitadoEm
+                              ? `Solicitado em ${new Date(c.solicitadoEm).toLocaleDateString('pt-BR')} às ${new Date(c.solicitadoEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
+                              : 'Data não registrada'}
+                            {' · '}Vence Dia {String(new Date(c.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}
+                          </p>
+                        </div>
+                        <span className="text-zinc-700 font-bold text-sm flex-shrink-0">{formatMoney(c.valor)}</span>
+                      </div>
+                    ))
+                  }
+                </div>
+              </div>
+
+              {/* A Vencer completo */}
+              <div className="bg-white/60 backdrop-blur-2xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+                <div className="px-6 py-5 border-b border-zinc-200/60">
+                  <h2 className="text-xl font-bold text-zinc-800">📋 Todas as contas a vencer</h2>
+                  <p className="text-zinc-500 text-sm mt-0.5">Lista completa — {aVencer.length} contas</p>
+                </div>
+                <div className="divide-y divide-zinc-100">
+                  {aVencer.length === 0
+                    ? <p className="px-6 py-6 text-zinc-400 text-sm">Nenhuma conta a vencer.</p>
+                    : aVencer.map(c => {
+                      const days = getDaysRemaining(c.vencimento)
+                      const urgente = days <= 0
+                      return (
+                        <div key={c.id} className={`flex items-center gap-3 px-6 py-4 transition-colors ${urgente ? 'bg-red-50/40 hover:bg-red-50' : 'hover:bg-zinc-50/60'}`}>
+                          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${urgente ? 'bg-red-500' : days <= 5 ? 'bg-yellow-500' : 'bg-zinc-300'}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-zinc-800 truncate">{c.nome}</p>
+                            <p className="text-xs text-zinc-400 mt-0.5">Vence Dia {String(new Date(c.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</p>
+                          </div>
+                          <span className="text-zinc-700 font-bold text-sm flex-shrink-0">{formatMoney(c.valor)}</span>
+                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${urgente ? 'bg-red-100 text-red-700 border-red-200' : days <= 5 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-zinc-100 text-zinc-600 border-zinc-200'}`}>
+                            {urgente ? 'Vencido' : `${days} dias`}
+                          </span>
+                        </div>
+                      )
+                    })
+                  }
+                </div>
+              </div>
+            </div>
+          )
+        })()}
       </div>
 
       {/* Histórico Modal */}
