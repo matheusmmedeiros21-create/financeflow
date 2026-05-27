@@ -6,8 +6,9 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 app.use(
-  pinoHttp({
+  (pinoHttp as any)({
     logger,
     serializers: {
       req(req: { id: string; method: string; url?: string }) {
