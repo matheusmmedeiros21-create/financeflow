@@ -37,7 +37,11 @@ export default defineConfig({
   },
   root: path.resolve(import.meta.dirname),
   build: {
-    outDir: path.resolve(import.meta.dirname, "public"),
+    // On Vercel (no REPL_ID) output to repo root /public so Vercel finds it by default.
+    // On Replit output stays inside the artifact folder.
+    outDir: process.env.REPL_ID
+      ? path.resolve(import.meta.dirname, "public")
+      : path.resolve(import.meta.dirname, "../../public"),
     emptyOutDir: true,
   },
   server: {
