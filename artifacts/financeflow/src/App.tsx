@@ -650,7 +650,7 @@ export default function FinanceFlow() {
                       {!isPagoRecente && (
                         <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
                           <span>💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span></span>
-                          <span>📅 <span className="font-semibold text-zinc-800">Dia {String(new Date(conta.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</span></span>
+                          <span>📅 <span className="font-semibold text-zinc-800">{`${new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}`}</span></span>
                           <span className={days <= 1 && conta.status !== 'Vencido' ? 'text-red-600 font-semibold' : ''}>
                             ⏰ {conta.status === 'Vencido' ? 'Vencido' : days <= 0 ? 'Vence hoje!' : `${days} dias restantes`}
                           </span>
@@ -766,7 +766,7 @@ export default function FinanceFlow() {
                       ? <span className="text-emerald-600 text-sm font-semibold animate-pulse flex-shrink-0">✓ Renovando...</span>
                       : <>
                           <span className="text-zinc-700 font-semibold text-sm hidden sm:block flex-shrink-0">{formatMoney(conta.valor)}</span>
-                          <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>📅 Dia {String(new Date(conta.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</span>
+                          <span className={`text-sm flex-shrink-0 ${dateColor[color]}`}>📅 {`${new Date(conta.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}`}</span>
                           <span className={`px-3 py-1 rounded-full text-xs font-bold border flex-shrink-0 ${badgeBg[color]}`}>{statusLabel[color]}</span>
                           <select
                             value={conta.status}
@@ -945,7 +945,7 @@ export default function FinanceFlow() {
                             {c.solicitadoEm
                               ? `Solicitado em ${new Date(c.solicitadoEm).toLocaleDateString('pt-BR')} às ${new Date(c.solicitadoEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`
                               : 'Data não registrada'}
-                            {' · '}Vence Dia {String(new Date(c.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}
+                            {' · '}Vence {`${new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}`}
                           </p>
                         </div>
                         <span className="text-zinc-700 font-bold text-sm flex-shrink-0">{formatMoney(c.valor)}</span>
@@ -972,7 +972,7 @@ export default function FinanceFlow() {
                           <div className={`w-2 h-2 rounded-full flex-shrink-0 ${urgente ? 'bg-red-500' : days <= 5 ? 'bg-yellow-500' : 'bg-zinc-300'}`} />
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-zinc-800 truncate">{c.nome}</p>
-                            <p className="text-xs text-zinc-400 mt-0.5">Vence Dia {String(new Date(c.vencimento + 'T12:00:00').getDate()).padStart(2, '0')}</p>
+                            <p className="text-xs text-zinc-400 mt-0.5">Vence {`${new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR')}`}</p>
                           </div>
                           <span className="text-zinc-700 font-bold text-sm flex-shrink-0">{formatMoney(c.valor)}</span>
                           <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold border flex-shrink-0 ${urgente ? 'bg-red-100 text-red-700 border-red-200' : days <= 5 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-zinc-100 text-zinc-600 border-zinc-200'}`}>
