@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm --filter @workspace/financeflow run build",
-  "outputDirectory": "artifacts/financeflow/dist/public",
+  "buildCommand": "pnpm --filter @workspace/financeflow run build && mkdir -p public && cp -r artifacts/financeflow/dist/public/. public/",
+  "outputDirectory": "public",
   "framework": null,
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
