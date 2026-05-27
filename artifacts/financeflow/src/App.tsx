@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Bell, Plus, Search, Trash2, Pencil, X, CalendarClock, List, PlusCircle } from 'lucide-react'
+import { Bell, Plus, Search, Trash2, Pencil, X, CalendarClock, List, PlusCircle, Download, RefreshCw, Moon, Sun } from 'lucide-react'
+import * as XLSX from 'xlsx'
 
 interface Conta {
   id: number
@@ -10,6 +11,7 @@ interface Conta {
   vencimento: string
   status: string
   solicitadoEm?: string
+  notas?: string
 }
 
 interface RegistroPagamento {
@@ -97,6 +99,7 @@ const EMPTY_FORM = {
   criada: '',
   vencimento: '',
   status: 'A Vencer',
+  notas: '',
 }
 
 type Tab = 'vencidos' | 'avencer' | 'solicitado' | 'vencimentos' | 'historico'
@@ -118,6 +121,8 @@ export default function FinanceFlow() {
   const [alertaContas, setAlertaContas] = useState<Conta[]>([])
   const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); return { month: d.getMonth(), year: d.getFullYear() } })
   const [calendarDiaSelecionado, setCalendarDiaSelecionado] = useState<number | null>(null)
+  const [sortBy, setSortBy] = useState<'data' | 'valor'>('data')
+  const [darkMode, setDarkMode] = useState(false)
   const timersRef = useRef<Record<number, ReturnType<typeof setTimeout>>>({})
   const alertadoRef = useRef(false)
 
@@ -259,11 +264,12 @@ export default function FinanceFlow() {
     })
     const filtered = byTab.filter(c => c.nome.toLowerCase().includes(search.toLowerCase()))
     return [...filtered].sort((a, b) => {
+      if (sortBy === 'valor') return sortOrder === 'asc' ? a.valor - b.valor : b.valor - a.valor
       const da = new Date(a.vencimento + 'T12:00:00').getTime()
       const db = new Date(b.vencimento + 'T12:00:00').getTime()
       return sortOrder === 'asc' ? da - db : db - da
     })
-  }, [search, contas, sortOrder, tab])
+  }, [search, contas, sortOrder, sortBy, tab])
 
   const vencimentosSorted = useMemo(
     () => [...contas].sort((a, b) =>
@@ -330,6 +336,32 @@ export default function FinanceFlow() {
     setContas(prev => prev.map(c => c.id === conta.id ? { ...c, status: newStatus, solicitadoEm } : c))
   }
 
+  const novoMes = () => {
+    if (!confirm('Isso vai avançar todas as datas pro próximo mês e resetar os status pra "A Vencer". Continuar?')) return
+    setContas(prev => prev.map(c => {
+      const d = new Date(c.vencimento + 'T12:00:00')
+      d.setMonth(d.getMonth() + 1)
+      return { ...c, vencimento: d.toISOString().split('T')[0], status: 'A Vencer', solicitadoEm: undefined }
+    }))
+  }
+
+  const exportarExcel = () => {
+    const dados = contas.map(c => ({
+      'Nome': c.nome,
+      'Valor (R$)': c.valor,
+      'Vencimento': new Date(c.vencimento + 'T12:00:00').toLocaleDateString('pt-BR'),
+      'Status': c.status,
+      'Tipo': c.tipo,
+      'Notas': c.notas || '',
+      'Solicitado em': c.solicitadoEm ? new Date(c.solicitadoEm).toLocaleDateString('pt-BR') : '',
+    }))
+    const ws = XLSX.utils.json_to_sheet(dados)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Contas')
+    ws['!cols'] = [{ wch: 45 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 10 }, { wch: 30 }, { wch: 16 }]
+    XLSX.writeFile(wb, `financeflow_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.xlsx`)
+  }
+
   const deleteHistoricoEntry = (nomeConta: string, registroId: number) => {
     setHistoricoPagamentos(prev => ({
       ...prev,
@@ -372,7 +404,7 @@ export default function FinanceFlow() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100 relative overflow-x-hidden">
+    <div className={`min-h-screen relative overflow-x-hidden transition-colors duration-300 ${darkMode ? 'bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-100'}`}>
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-emerald-400/20 blur-3xl" />
         <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-blue-400/15 blur-3xl" />
@@ -465,6 +497,17 @@ export default function FinanceFlow() {
                 />
               </div>
             )}
+            <button onClick={novoMes} className="bg-white/80 hover:bg-white border border-zinc-200 text-zinc-700 px-4 py-3.5 rounded-2xl flex items-center gap-2 shadow font-semibold text-sm transition-all" title="Avançar todas as contas para o próximo mês">
+              <RefreshCw size={16} />
+              Novo Mês
+            </button>
+            <button onClick={exportarExcel} className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-4 py-3.5 rounded-2xl flex items-center gap-2 shadow-lg font-semibold text-sm transition-all">
+              <Download size={16} />
+              Excel
+            </button>
+            <button onClick={() => setDarkMode(d => !d)} className="bg-white/80 hover:bg-white border border-zinc-200 text-zinc-700 p-3.5 rounded-2xl shadow font-semibold text-sm transition-all" title="Modo escuro">
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
             <button
               onClick={() => setShowModal(true)}
               className="bg-zinc-900 hover:bg-zinc-700 active:scale-95 text-white px-5 py-3.5 rounded-2xl flex items-center gap-2 shadow-lg font-semibold text-sm transition-all"
@@ -478,8 +521,9 @@ export default function FinanceFlow() {
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <SummaryCard emoji="🔥" label="Urgentes" value={String(urgentAccounts.length)} accent="red" />
-          <SummaryCard emoji="✅" label="Vencidos" value={String(paidAccounts.length)} accent="green" />
-          <SummaryCard emoji="💰" label="Total do Mês" value={formatMoney(totalMonth)} accent="blue" />
+          <SummaryCard emoji="📋" label="A Vencer" value={formatMoney(contas.filter(c=>c.status==='A Vencer').reduce((s,c)=>s+c.valor,0))} accent="yellow" />
+          <SummaryCard emoji="🔵" label="Solicitado" value={formatMoney(contas.filter(c=>c.status==='Solicitado').reduce((s,c)=>s+c.valor,0))} accent="blue" />
+          <SummaryCard emoji="💰" label="Total do Mês" value={formatMoney(totalMonth)} accent="green" />
         </div>
 
         {/* Tab Switcher */}
@@ -545,10 +589,16 @@ export default function FinanceFlow() {
               </div>
               <div className="flex items-center gap-3 flex-wrap">
                 <button
+                  onClick={() => setSortBy(s => s === 'data' ? 'valor' : 'data')}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white/80 border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
+                >
+                  {sortBy === 'data' ? '📅 Data' : '💰 Valor'}
+                </button>
+                <button
                   onClick={() => setSortOrder(o => o === 'asc' ? 'desc' : 'asc')}
                   className="flex items-center gap-2 px-4 py-2.5 bg-white/80 border border-zinc-200 rounded-xl text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
                 >
-                  📅 Vencimento {sortOrder === 'asc' ? '↑ Menor primeiro' : '↓ Maior primeiro'}
+                  {sortOrder === 'asc' ? '↑ Menor primeiro' : '↓ Maior primeiro'}
                 </button>
                 {urgentAccounts.length > 0 && (
                   <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-2xl font-semibold text-sm">
@@ -578,7 +628,7 @@ export default function FinanceFlow() {
                     }`}
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
                         <h3 className={`text-lg font-bold text-zinc-900 truncate ${isPagoRecente ? 'line-through text-zinc-400' : ''}`}>
                           {conta.nome}
                         </h3>
@@ -594,6 +644,9 @@ export default function FinanceFlow() {
                           </>
                         )}
                       </div>
+                      {conta.notas && (
+                        <p className="text-xs text-zinc-500 mb-2 italic">📝 {conta.notas}</p>
+                      )}
                       {!isPagoRecente && (
                         <div className="flex flex-wrap gap-4 text-sm text-zinc-600">
                           <span>💰 <span className="font-semibold text-zinc-800">{formatMoney(conta.valor)}</span></span>
@@ -1115,7 +1168,7 @@ export default function FinanceFlow() {
                 onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-400/50 text-zinc-900 text-sm transition-all cursor-pointer"
               >
-                <option>Pendente</option>
+                <option value="A Vencer">A Vencer</option>
                 <option value="Vencido">Vencido</option>
                 <option>Solicitado</option>
               </select>
@@ -1136,6 +1189,18 @@ export default function FinanceFlow() {
                 value={form.vencimento}
                 onChange={e => setForm(f => ({ ...f, vencimento: e.target.value }))}
                 className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-400/50 text-zinc-900 text-sm transition-all"
+              />
+            </FormField>
+          </div>
+
+          <div className="sm:col-span-2 mt-1">
+            <FormField label="Notas / Observações">
+              <textarea
+                value={(form as typeof EMPTY_FORM & { notas?: string }).notas || ''}
+                onChange={e => setForm(f => ({ ...f, notas: e.target.value }))}
+                placeholder="Ex: Pagar via PIX, parcelado 3x, chave pix: ..."
+                rows={2}
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-400/50 text-zinc-900 text-sm transition-all resize-none"
               />
             </FormField>
           </div>
