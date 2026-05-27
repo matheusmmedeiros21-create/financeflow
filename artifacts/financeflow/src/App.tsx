@@ -472,7 +472,6 @@ export default function FinanceFlow() {
         {/* Summary Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <SummaryCard emoji="🔥" label="Urgentes" value={String(urgentAccounts.length)} accent="red" />
-          <SummaryCard emoji="⚠️" label="Próximas" value={String(nextAccounts.length)} accent="yellow" />
           <SummaryCard emoji="✅" label="Vencidos" value={String(paidAccounts.length)} accent="green" />
           <SummaryCard emoji="💰" label="Total do Mês" value={formatMoney(totalMonth)} accent="blue" />
         </div>
