@@ -1,0 +1,32 @@
+10:45:56.611 
+failed to load config from /vercel/path0/artifacts/financeflow/vite.config.ts
+10:45:56.614 
+error during build:
+10:45:56.614 
+Error: PORT environment variable is required but was not provided.
+10:45:56.614 
+    at file:///vercel/path0/artifacts/financeflow/node_modules/.vite-temp/vite.config.ts.timestamp-1779889556493-28ccb922484918.mjs:10:9
+10:45:56.614 
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+10:45:56.614 
+    at async node:internal/modules/esm/loader:639:26
+10:45:56.614 
+    at async loadConfigFromBundledFile (file:///vercel/path0/node_modules/.pnpm/vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_tsx@4.21.0_yaml@2.8.4/node_modules/vite/dist/node/chunks/config.js:35936:12)
+10:45:56.614 
+    at async bundleAndLoadConfigFile (file:///vercel/path0/node_modules/.pnpm/vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_tsx@4.21.0_yaml@2.8.4/node_modules/vite/dist/node/chunks/config.js:35824:17)
+10:45:56.614 
+    at async loadConfigFromFile (file:///vercel/path0/node_modules/.pnpm/vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_tsx@4.21.0_yaml@2.8.4/node_modules/vite/dist/node/chunks/config.js:35791:42)
+10:45:56.615 
+    at async resolveConfig (file:///vercel/path0/node_modules/.pnpm/vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_tsx@4.21.0_yaml@2.8.4/node_modules/vite/dist/node/chunks/config.js:35440:22)
+10:45:56.615 
+    at async createBuilder (file:///vercel/path0/node_modules/.pnpm/vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_tsx@4.21.0_yaml@2.8.4/node_modules/vite/dist/node/chunks/config.js:33895:19)
+10:45:56.615 
+    at async CAC.<anonymous> (file:///vercel/path0/node_modules/.pnpm/vite@7.3.3_@types+node@25.6.2_jiti@2.7.0_lightningcss@1.32.0_tsx@4.21.0_yaml@2.8.4/node_modules/vite/dist/node/cli.js:629:10)
+10:45:56.639 
+/vercel/path0/artifacts/financeflow:
+10:45:56.639 
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @workspace/financeflow@0.0.0 build: `vite build --config vite.config.ts`
+10:45:56.639 
+Exit status 1
+10:45:56.655 
+Error: Command "pnpm --filter @workspace/financeflow run build" exited with 1
